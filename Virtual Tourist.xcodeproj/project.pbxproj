@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		71A920F44A82C228C7F2B6F0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A9248EC746E15656938756 /* ViewController.swift */; };
-		71A9227AA78C5DDB8628AABB /* Virtual_Tourist.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 71A921F2C13A9A331283F901 /* Virtual_Tourist.xcdatamodel */; };
+		71A9227AA78C5DDB8628AABB /* VirtualTourist.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 71A921F2C13A9A331283F901 /* VirtualTourist.xcdatamodel */; };
 		92AB3AD82574F4F600C641B7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92AB3AD72574F4F600C641B7 /* AppDelegate.swift */; };
 		92AB3ADA2574F4F600C641B7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92AB3AD92574F4F600C641B7 /* SceneDelegate.swift */; };
 		92AB3ADF2574F4F600C641B7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 92AB3ADD2574F4F600C641B7 /* Main.storyboard */; };
@@ -37,7 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		71A921F2C13A9A331283F901 /* Virtual_Tourist.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Virtual_Tourist.xcdatamodel; sourceTree = "<group>"; };
+		71A921F2C13A9A331283F901 /* VirtualTourist.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = VirtualTourist.xcdatamodel; sourceTree = "<group>"; };
 		71A9248EC746E15656938756 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		92AB3AD42574F4F600C641B7 /* Virtual Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		92AB3AD72574F4F600C641B7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -91,7 +91,7 @@
 		71A92AE967CD8D1ECE20AA3D /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				71A921F2C13A9A331283F901 /* Virtual_Tourist.xcdatamodel */,
+				71A921F2C13A9A331283F901 /* VirtualTourist.xcdatamodel */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -299,7 +299,7 @@
 			files = (
 				92AB3AD82574F4F600C641B7 /* AppDelegate.swift in Sources */,
 				92AB3ADA2574F4F600C641B7 /* SceneDelegate.swift in Sources */,
-				71A9227AA78C5DDB8628AABB /* Virtual_Tourist.xcdatamodel in Sources */,
+				71A9227AA78C5DDB8628AABB /* VirtualTourist.xcdatamodel in Sources */,
 				71A920F44A82C228C7F2B6F0 /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
