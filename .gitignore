@@ -91,3 +91,6 @@ iOSInjectionProject/
 
 # AppCode
 .idea
+
+# API Keys
+Secrets.plist
