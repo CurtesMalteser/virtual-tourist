@@ -6,9 +6,9 @@ import UIKit
 
 extension UIWindow {
 
-    func injectRootViewControllerAsMapVC() {
+    func injectRootViewControllerAsMapVC(dataController: DataController) {
         let mapViewController = rootViewController as! MapViewController
-        mapViewController.dataController = DataController(modelName: "VirtualTourist")
+        mapViewController.dataController = dataController
     }
 
 /*    private func initApiKey() -> String {
