@@ -20,6 +20,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         travelLocationsMap.addGestureRecognizer(longPressRecogniser)
+        
     }
 
     deinit {
