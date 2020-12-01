@@ -9,9 +9,12 @@ import UIKit
 
 class MapViewController: UIViewController {
 
+    var apiKey: String!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        print("apiKey did load \(String(describing: apiKey))")
     }
 
 }
