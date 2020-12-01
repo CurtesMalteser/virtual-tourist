@@ -20,6 +20,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         travelLocationsMap.addGestureRecognizer(longPressRecogniser)
+        
     }
 
     deinit {
@@ -38,10 +39,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     }
 
     private func addStudentsPointAnnotation(mapView: MKMapView, coordinates: CLLocationCoordinate2D) {
-
         let annotations: MKPointAnnotation = MKPointAnnotation()
         annotations.coordinate = coordinates
-
         mapView.addAnnotation(annotations)
     }
 
