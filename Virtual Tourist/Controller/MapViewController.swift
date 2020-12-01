@@ -14,7 +14,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     private lazy var longPressRecogniser: UILongPressGestureRecognizer = initLongPressGestureRecognizer()
 
-    var apiKey: String!
+    var dataController: DataController!
 
     override func viewDidLoad() {
         super.viewDidLoad()

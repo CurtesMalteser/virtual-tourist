@@ -8,10 +8,10 @@ extension UIWindow {
 
     func injectRootViewControllerAsMapVC() {
         let mapViewController = rootViewController as! MapViewController
-        mapViewController.apiKey = initApiKey()
+        mapViewController.dataController = DataController(modelName: "VirtualTourist")
     }
 
-    private func initApiKey() -> String {
+/*    private func initApiKey() -> String {
         guard let filePath = Bundle.main.path(forResource: "Secrets", ofType: "plist")
                 else {
             fatalError("Secrets.plist not found.")
@@ -24,5 +24,5 @@ extension UIWindow {
         }
 
         return key
-    }
+    }*/
 }
