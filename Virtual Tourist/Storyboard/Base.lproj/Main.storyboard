@@ -29,6 +29,9 @@
                             <constraint firstItem="fBu-YM-ABz" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="44" id="Sqk-n5-BbK"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="travelLocationsMap" destination="fBu-YM-ABz" id="REc-zy-8LJ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
