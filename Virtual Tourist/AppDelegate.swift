@@ -11,10 +11,15 @@ import CoreData
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    private lazy var apiKey: String = initApiKey()
+    var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+
+        if let window = window {
+            window.injectRootViewControllerAsMapVC()
+        }
+
         return true
     }
 
@@ -75,21 +80,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
-    }
-
-    private func initApiKey() -> String {
-        guard let filePath = Bundle.main.path(forResource: "Secrets", ofType: "plist")
-                else {
-            fatalError("Secrets.plist not found.")
-        }
-
-        let plist = NSDictionary(contentsOfFile: filePath)
-
-        guard let key = plist?.object(forKey: "apiKey") as? String else {
-            fatalError("'apiKey' not found on 'Secrets.plist' file.")
-        }
-
-        return key
     }
 
 }
