@@ -19,6 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         if let window = window {
             let dataController = (UIApplication.shared.delegate as? AppDelegate)?.dataController
+            dataController!.load()
             window.injectRootViewControllerAsMapVC(dataController: dataController!)
         }
 

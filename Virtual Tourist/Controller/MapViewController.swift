@@ -7,6 +7,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class MapViewController: UIViewController, MKMapViewDelegate {
 
@@ -16,11 +17,19 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     var dataController: DataController!
 
+    // TODO save inserted pins
+    // TODO populate the map with stored pins
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         travelLocationsMap.addGestureRecognizer(longPressRecogniser)
-        
+
+        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
+
+        if let result = try? dataController.viewContext.fetch(fetchRequest) {
+            print("result \(result)")
+        }
     }
 
     deinit {

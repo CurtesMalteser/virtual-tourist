@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
 
         if let window = window {
+            dataController.load()
             window.injectRootViewControllerAsMapVC(dataController: dataController)
         }
 
