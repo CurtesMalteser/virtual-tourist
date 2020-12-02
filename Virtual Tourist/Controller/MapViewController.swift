@@ -17,8 +17,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     var dataController: DataController!
 
-    // TODO populate the map with stored pins
-
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -26,8 +24,15 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
 
+        // TODO: wrap in try catch
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
-            print("result \(result.count)")
+            if (result.count > 0) {
+                result.forEach { pin in
+                    addPinToMap(
+                            coordinates: CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude),
+                            mapView: travelLocationsMap)
+                }
+            }
         }
 
     }
@@ -56,15 +61,18 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
         do {
             try dataController.viewContext.save()
-
-            let annotations: MKPointAnnotation = MKPointAnnotation()
-            annotations.coordinate = coordinates
-            mapView.addAnnotation(annotations)
-
+            addPinToMap(coordinates: coordinates, mapView: mapView)
         } catch {
             // todo handle with meaningful info to the user
         }
 
+    }
+
+    // TODO: store the CLLocationCoordinate2D instead of lat and long
+    private func addPinToMap(coordinates: CLLocationCoordinate2D, mapView: MKMapView) {
+        let annotations: MKPointAnnotation = MKPointAnnotation()
+        annotations.coordinate = coordinates
+        mapView.addAnnotation(annotations)
     }
 
     // Unused and added to be used on next VC
