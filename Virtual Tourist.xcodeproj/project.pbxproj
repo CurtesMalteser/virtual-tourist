@@ -84,12 +84,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		71A9246097ECC2DE0EBE2614 /* Controller */ = {
+		71A9246097ECC2DE0EBE2614 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
 				71A9248EC746E15656938756 /* MapViewController.swift */,
 			);
-			path = Controller;
+			path = ViewController;
 			sourceTree = "<group>";
 		};
 		71A926C7DBE7D3D43CFBFA90 /* Extensions */ = {
@@ -139,7 +139,7 @@
 				92AB3AE82574F4F700C641B7 /* Info.plist */,
 				92AB3B152575341D00C641B7 /* Secrets.plist */,
 				71A92AE967CD8D1ECE20AA3D /* Model */,
-				71A9246097ECC2DE0EBE2614 /* Controller */,
+				71A9246097ECC2DE0EBE2614 /* ViewController */,
 				71A926C7DBE7D3D43CFBFA90 /* Extensions */,
 			);
 			path = "Virtual Tourist";
