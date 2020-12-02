@@ -7,6 +7,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class MapViewController: UIViewController, MKMapViewDelegate {
 
@@ -14,13 +15,26 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     private lazy var longPressRecogniser: UILongPressGestureRecognizer = initLongPressGestureRecognizer()
 
-    var apiKey: String!
+    var dataController: DataController!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         travelLocationsMap.addGestureRecognizer(longPressRecogniser)
-        
+
+        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
+
+        // TODO: wrap in try catch
+        if let result = try? dataController.viewContext.fetch(fetchRequest) {
+            if (result.count > 0) {
+                result.forEach { pin in
+                    addPinToMap(
+                            coordinates: CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude),
+                            mapView: travelLocationsMap)
+                }
+            }
+        }
+
     }
 
     deinit {
@@ -39,9 +53,39 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     }
 
     private func addStudentsPointAnnotation(mapView: MKMapView, coordinates: CLLocationCoordinate2D) {
+
+        let pin = Pin(context: dataController.viewContext)
+        pin.latitude = coordinates.latitude
+        pin.longitude = coordinates.longitude
+
+
+        do {
+            try dataController.viewContext.save()
+            addPinToMap(coordinates: coordinates, mapView: mapView)
+        } catch {
+            // todo handle with meaningful info to the user
+        }
+
+    }
+
+    // TODO: store the CLLocationCoordinate2D instead of lat and long
+    private func addPinToMap(coordinates: CLLocationCoordinate2D, mapView: MKMapView) {
         let annotations: MKPointAnnotation = MKPointAnnotation()
         annotations.coordinate = coordinates
         mapView.addAnnotation(annotations)
+    }
+
+    // Unused and added to be used on next VC
+    private func deletePin(pin: Pin) {
+
+        dataController.viewContext.delete(pin)
+
+        do {
+            try dataController.viewContext.save()
+
+        } catch {
+            // todo handle with meaningful info to the user
+        }
     }
 
     private func initLongPressGestureRecognizer() -> UILongPressGestureRecognizer {
