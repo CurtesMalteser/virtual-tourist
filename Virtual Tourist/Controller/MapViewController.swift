@@ -17,7 +17,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     var dataController: DataController!
 
-    // TODO save inserted pins
     // TODO populate the map with stored pins
 
     override func viewDidLoad() {
@@ -28,8 +27,9 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
 
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
-            print("result \(result)")
+            print("result \(result.count)")
         }
+
     }
 
     deinit {
@@ -48,9 +48,36 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     }
 
     private func addStudentsPointAnnotation(mapView: MKMapView, coordinates: CLLocationCoordinate2D) {
-        let annotations: MKPointAnnotation = MKPointAnnotation()
-        annotations.coordinate = coordinates
-        mapView.addAnnotation(annotations)
+
+        let pin = Pin(context: dataController.viewContext)
+        pin.latitude = coordinates.latitude
+        pin.longitude = coordinates.longitude
+
+
+        do {
+            try dataController.viewContext.save()
+
+            let annotations: MKPointAnnotation = MKPointAnnotation()
+            annotations.coordinate = coordinates
+            mapView.addAnnotation(annotations)
+
+        } catch {
+            // todo handle with meaningful info to the user
+        }
+
+    }
+
+    // Unused and added to be used on next VC
+    private func deletePin(pin: Pin) {
+
+        dataController.viewContext.delete(pin)
+
+        do {
+            try dataController.viewContext.save()
+
+        } catch {
+            // todo handle with meaningful info to the user
+        }
     }
 
     private func initLongPressGestureRecognizer() -> UILongPressGestureRecognizer {
