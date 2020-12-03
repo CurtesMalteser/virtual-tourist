@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="ihc-0g-nYS">
     <device id="retina6_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
@@ -30,8 +30,10 @@
                             <constraint firstItem="fBu-YM-ABz" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="44" id="Sqk-n5-BbK"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="62T-TQ-Cp8"/>
                     <connections>
                         <outlet property="travelLocationsMap" destination="fBu-YM-ABz" id="REc-zy-8LJ"/>
+                        <segue destination="aap-YI-HrL" kind="show" id="DCs-b9-k6a"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -47,17 +49,17 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="aap-YI-HrL" kind="relationship" relationship="rootViewController" id="eY5-gE-9Jt"/>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="mEK-YT-TGc"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TfU-jU-eS4" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="657" y="67"/>
+            <point key="canvasLocation" x="-925" y="67"/>
         </scene>
         <!--Photo Album View Controller-->
         <scene sceneID="9Ul-GK-Ywn">
             <objects>
-                <viewController id="aap-YI-HrL" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PhotoAlbumViewController" id="aap-YI-HrL" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="LvV-iT-lgX">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -111,7 +113,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hXE-Yb-EF7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1484" y="67"/>
+            <point key="canvasLocation" x="654" y="67"/>
         </scene>
     </scenes>
     <resources>

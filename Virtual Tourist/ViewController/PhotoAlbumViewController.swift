@@ -9,6 +9,7 @@ import UIKit
 
 class PhotoAlbumViewController: UIViewController {
 
+    static let identifier: String = "PhotoAlbumViewController"
     var pin: Pin!
     var dataController: DataController!
 

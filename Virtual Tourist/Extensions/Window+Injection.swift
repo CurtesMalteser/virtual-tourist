@@ -7,7 +7,8 @@ import UIKit
 extension UIWindow {
 
     func injectRootViewControllerAsMapVC(dataController: DataController) {
-        let mapViewController = rootViewController as! MapViewController
+        let navigationController = rootViewController as! UINavigationController
+        let mapViewController = navigationController.topViewController as! MapViewController
         mapViewController.dataController = dataController
     }
 
