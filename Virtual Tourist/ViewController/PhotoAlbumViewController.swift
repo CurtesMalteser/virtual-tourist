@@ -9,4 +9,7 @@ import UIKit
 
 class PhotoAlbumViewController: UIViewController {
 
+    var pin: Pin!
+    var dataController: DataController!
+
 }
