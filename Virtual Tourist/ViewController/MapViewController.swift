@@ -111,7 +111,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     private func pushPhotoAlbumViewController(pin: Pin) {
 
-        pushMemeDetail(storyboard: storyboard,
+        pushViewControllerWithInject(storyboard: storyboard,
                 identifier: PhotoAlbumViewController.identifier,
                 navigationController: navigationController) { viewController in
             let photoAlbumViewController = viewController as! PhotoAlbumViewController

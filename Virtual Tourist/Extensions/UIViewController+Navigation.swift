@@ -7,10 +7,10 @@ import UIKit
 extension UIViewController {
 
     // Push view controller
-    func pushMemeDetail<T: UIViewController>(storyboard: UIStoryboard?,
-                                           identifier: String,
-                        navigationController: UINavigationController?,
-                        injectArgs: (_ targetVC: T) -> Void) {
+    func pushViewControllerWithInject<T: UIViewController>(storyboard: UIStoryboard?,
+                                                           identifier: String,
+                                                           navigationController: UINavigationController?,
+                                                           injectArgs: (_ targetVC: T) -> Void) {
 
         let viewController = storyboard?.instantiateViewController(withIdentifier: identifier) as! T
 
