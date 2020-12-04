@@ -9,20 +9,19 @@ import Foundation
 
 struct PhotosSearch: Codable {
     let photos: Photos
-    let stat: String
 }
 
 struct Photos: Codable {
     let page, pages, perPage: Int
-    let total: String
-    let photo: [PhotoResponse]
+    let total: String?
+    let photoListResponse: [PhotoResponse]?
 
     enum CodingKeys: String, CodingKey {
         case page = "page"
         case pages = "pages"
         case perPage = "perpage"
         case total = "total"
-        case photo = "photo"
+        case photoListResponse = "photo"
     }
 
 }
@@ -36,7 +35,7 @@ struct PhotoResponse: Codable {
 // MARK: PhotoSizeResponse
 // Used to parse the JSON response for each PhotoResponse id
 struct PhotoSizeResponse: Codable {
-    let sizes: Sizes
+    let sizes: Sizes?
     let stat: String
 }
 
@@ -57,16 +56,14 @@ struct Sizes: Codable {
 struct PhotoSize: Codable {
     let size: PhotoSizeEnum
     let width, height: Int
-    let source: String
-    let url: String
+    let photoURL: String
     let media: Media
 
     enum CodingKeys: String, CodingKey {
         case size = "label"
         case width = "width"
         case height = "height"
-        case source = "source"
-        case url = "url"
+        case photoURL = "source"
         case media = "media"
     }
 }
@@ -90,5 +87,7 @@ enum PhotoSizeEnum: String, Codable {
     case large2048 = "Large 2048"
     case xLarge3K = "X-Large 3K"
     case xLarge4K = "X-Large 4K"
+    case xLarge5K = "X-Large 5K"
+    case xLarge6K = "X-Large 6K"
     case original = "Original"
 }
