@@ -11,11 +11,12 @@ struct Endpoint {
     var queryItems: [URLQueryItem] = []
 }
 
-private extension Endpoint {
+extension Endpoint {
     var url: URL {
         var components = URLComponents()
         components.scheme = "https"
-        components.host = "https://www.flickr.com/services/rest/"
+        components.host = "www.flickr.com"
+        components.path = "/services/rest/"
         components.queryItems = queryItems
 
         guard let url = components.url else {
@@ -47,7 +48,7 @@ extension Endpoint {
                     value: String(radius))
         ]
 
-        let items = setMethodAndKeyAPI(method: methodGetPhotoURL, apiKey: key, queryItems: endpointQueryItems)
+        let items = setMethodAndKeyAPI(method: methodSearchPhoto, apiKey: key, queryItems: endpointQueryItems)
 
         return Endpoint(
                 queryItems: items)

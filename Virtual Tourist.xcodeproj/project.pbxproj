@@ -15,6 +15,7 @@
 		924FA6602577E6AE0060113A /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924FA65F2577E6AE0060113A /* PhotoAlbumViewController.swift */; };
 		924FA677257930830060113A /* VirtualTouristAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924FA676257930830060113A /* VirtualTouristAPI.swift */; };
 		924FA67C257950450060113A /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924FA67B257950450060113A /* Endpoint.swift */; };
+		924FA681257A373A0060113A /* PhotosSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924FA680257A373A0060113A /* PhotosSearch.swift */; };
 		92AB3AD82574F4F600C641B7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92AB3AD72574F4F600C641B7 /* AppDelegate.swift */; };
 		92AB3ADA2574F4F600C641B7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92AB3AD92574F4F600C641B7 /* SceneDelegate.swift */; };
 		92AB3ADF2574F4F600C641B7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 92AB3ADD2574F4F600C641B7 /* Main.storyboard */; };
@@ -51,6 +52,7 @@
 		924FA65F2577E6AE0060113A /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
 		924FA676257930830060113A /* VirtualTouristAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualTouristAPI.swift; sourceTree = "<group>"; };
 		924FA67B257950450060113A /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
+		924FA680257A373A0060113A /* PhotosSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosSearch.swift; sourceTree = "<group>"; };
 		92AB3AD42574F4F600C641B7 /* Virtual Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		92AB3AD72574F4F600C641B7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		92AB3AD92574F4F600C641B7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 			children = (
 				924FA676257930830060113A /* VirtualTouristAPI.swift */,
 				924FA67B257950450060113A /* Endpoint.swift */,
+				924FA680257A373A0060113A /* PhotosSearch.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -331,6 +334,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				924FA681257A373A0060113A /* PhotosSearch.swift in Sources */,
 				92AB3AD82574F4F600C641B7 /* AppDelegate.swift in Sources */,
 				924FA6602577E6AE0060113A /* PhotoAlbumViewController.swift in Sources */,
 				9220E00B2576C6CD0082E673 /* DataController.swift in Sources */,
