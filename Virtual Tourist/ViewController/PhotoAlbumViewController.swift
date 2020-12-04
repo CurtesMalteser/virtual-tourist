@@ -6,15 +6,27 @@
 //
 
 import UIKit
+import MapKit
 
-class PhotoAlbumViewController: UIViewController {
+class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate {
 
+    @IBOutlet weak var mapView: MKMapView!
+   
+    @IBOutlet weak var photosCollectionView: UICollectionView!
+    
+    @IBOutlet weak var btnNewCollection: UIButton!
+    
+    @IBAction func actionNewCollection(_ sender: Any) {
+    }
+    
     static let identifier: String = "PhotoAlbumViewController"
     var pin: Pin!
     var dataController: DataController!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        photosCollectionView.delegate = self
 
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let apiKey = appDelegate.apiKey
@@ -64,4 +76,9 @@ class PhotoAlbumViewController: UIViewController {
                     print(error)
                 })
     }
+
+    private func refreshCollectionView() {
+        photosCollectionView.reloadData()
+    }
+
 }
