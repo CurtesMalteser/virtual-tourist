@@ -27,7 +27,7 @@ class PhotoAlbumViewController: UIViewController {
 
                     print("photosSearch \(photosSearch)")
 
-                    photosSearch.photos.photo.forEach { photo in
+                    photosSearch.photos.photo.forEach({ photo in
 
                         let url = Endpoint
                                 .fetchPhotoURLs(apiKey: apiKey, photoResponse: photo)
@@ -40,11 +40,24 @@ class PhotoAlbumViewController: UIViewController {
 
                                     print("photoSizeResponse \(photoSizeResponse)")
 
+                                    let largeSize: PhotoSize = photoSizeResponse.sizes.photoSize.first { size in
+                                        size.size == PhotoSizeEnum.large
+                                    } ?? photoSizeResponse.sizes.photoSize.last!
+
+
+
+                                    VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.url)!,
+                                            successHandler: { (data: Data) in
+                                                print("photoData: \(data)")
+                                            }, errorHandler: { error in
+
+                                            }
+                                    )
 
                                 }, errorHandler: { error in
                             print(error)
                         })
-                    }
+                    })
                 },
                 errorHandler: {
                     error in

@@ -55,13 +55,40 @@ struct Sizes: Codable {
 
 // MARK: - PhotoSize
 struct PhotoSize: Codable {
-    let label: String
+    let size: PhotoSizeEnum
     let width, height: Int
     let source: String
     let url: String
     let media: Media
+
+    enum CodingKeys: String, CodingKey {
+        case size = "label"
+        case width = "width"
+        case height = "height"
+        case source = "source"
+        case url = "url"
+        case media = "media"
+    }
 }
 
 enum Media: String, Codable {
     case photo = "photo"
+}
+
+enum PhotoSizeEnum: String, Codable {
+    case square = "Square"
+    case largeSquare = "Large Square"
+    case thumbnail = "Thumbnail"
+    case small = "Small"
+    case small320 = "Small 320"
+    case small400 = "Small 400"
+    case medium = "Medium"
+    case medium640 = "Medium 640"
+    case medium800 = "Medium 800"
+    case large = "Large"
+    case large1600 = "Large 1600"
+    case large2048 = "Large 2048"
+    case xLarge3K = "X-Large 3K"
+    case xLarge4K = "X-Large 4K"
+    case original = "Original"
 }

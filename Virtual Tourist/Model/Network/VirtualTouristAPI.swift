@@ -11,8 +11,7 @@ class VirtualTouristAPI {
 
     class func executeDataTask<T: Codable>(url: URL, successHandler: @escaping (T) -> Void, errorHandler: @escaping (Error?) -> Void) {
 
-        let task = URLSession.shared.dataTask(with: url) {
-            (data, response, error) in
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data else {
                 print("no data")
                 return
@@ -27,6 +26,19 @@ class VirtualTouristAPI {
                 errorHandler(error)
             }
 
+        }
+
+        task.resume()
+    }
+
+    class func executeDataDataTask(url: URL, successHandler: @escaping (Data) -> Void, errorHandler: @escaping (Error?) -> Void) {
+
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data else {
+                print("no data")
+                return
+            }
+            successHandler(data)
         }
 
         task.resume()
