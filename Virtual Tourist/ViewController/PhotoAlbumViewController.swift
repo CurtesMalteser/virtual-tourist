@@ -28,18 +28,16 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
-
-        if let result = try? dataController.viewContext.fetch(fetchRequest) {
-            if (result.count > 0) {
-                photosArray = result
-                print("photosArray \(photosArray.count)")
-            }
-        }
-
         photosCollectionView.delegate = self
         photosCollectionView.dataSource = self
 
+        fetchPhotosCollectionView()
+
+
+
+    }
+
+    private func fetchPhotosForPin() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let apiKey = appDelegate.apiKey
 
@@ -75,7 +73,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                                 do {
                                                     try self.dataController.viewContext.save()
                                                     DispatchQueue.main.async {
-                                                        self.refreshCollectionView()
+                                                        self.photosCollectionView.reloadData()
                                                     }
                                                 } catch {
                                                     // todo handle with meaningful info to the user
@@ -117,7 +115,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
 
-    private func refreshCollectionView() {
+    private func fetchPhotosCollectionView() {
 
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
 
@@ -125,6 +123,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             if (result.count > 0) {
                 self.photosArray = result
                 photosCollectionView.reloadData()
+            } else {
+                fetchPhotosForPin()
             }
         }
 
