@@ -83,7 +83,7 @@
                                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         </collectionViewFlowLayout>
                                         <cells>
-                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="GxU-oI-1RZ" customClass="PhotoCollectionViewCell" customModule="Virtual_Tourist" customModuleProvider="target">
+                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="PhotoCollectionViewCell" id="GxU-oI-1RZ" customClass="PhotoCollectionViewCell" customModule="Virtual_Tourist" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="B1T-Jw-EQg">
@@ -128,9 +128,9 @@
                     </view>
                     <navigationItem key="navigationItem" id="eGW-Ux-6iA"/>
                     <connections>
-                        <outlet property="photosCollectionView" destination="Jwp-Uj-MeT" id="qIw-dI-y66"/>
                         <outlet property="btnNewCollection" destination="iwu-RW-bBy" id="aT2-IX-nZ2"/>
                         <outlet property="mapView" destination="1qj-ao-wUR" id="WSL-RU-HeL"/>
+                        <outlet property="photosCollectionView" destination="Jwp-Uj-MeT" id="qIw-dI-y66"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hXE-Yb-EF7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

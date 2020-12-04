@@ -8,5 +8,8 @@
 import UIKit
 
 class PhotoCollectionViewCell: UICollectionViewCell {
+
+    static let identifier: String = "PhotoCollectionViewCell"
+
     @IBOutlet weak var imageView: UIImageView!
 }

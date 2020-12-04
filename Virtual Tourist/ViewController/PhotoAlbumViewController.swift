@@ -8,25 +8,28 @@
 import UIKit
 import MapKit
 
-class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate {
+class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
 
     @IBOutlet weak var mapView: MKMapView!
-   
+
     @IBOutlet weak var photosCollectionView: UICollectionView!
-    
+
     @IBOutlet weak var btnNewCollection: UIButton!
-    
+
     @IBAction func actionNewCollection(_ sender: Any) {
     }
-    
+
     static let identifier: String = "PhotoAlbumViewController"
     var pin: Pin!
     var dataController: DataController!
+
+    var photosResponseArray: [PhotoResponse] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         photosCollectionView.delegate = self
+        photosCollectionView.dataSource = self
 
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let apiKey = appDelegate.apiKey
@@ -37,7 +40,10 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate {
                 successHandler: {
                     (photosSearch: PhotosSearch) in
 
-                    print("photosSearch \(photosSearch)")
+                    DispatchQueue.main.async {
+                        self.refreshCollectionView(photosResponse: photosSearch.photos.photo)
+                    }
+
 
                     photosSearch.photos.photo.forEach({ photo in
 
@@ -57,13 +63,12 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate {
                                     } ?? photoSizeResponse.sizes.photoSize.last!
 
 
-
                                     VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.url)!,
                                             successHandler: { (data: Data) in
                                                 print("photoData: \(data)")
                                             }, errorHandler: { error in
 
-                                            }
+                                    }
                                     )
 
                                 }, errorHandler: { error in
@@ -77,7 +82,23 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate {
                 })
     }
 
-    private func refreshCollectionView() {
+
+
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as! PhotoCollectionViewCell
+
+        return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        photosResponseArray.count
+    }
+
+
+    private func refreshCollectionView(photosResponse: [PhotoResponse]) {
+        photosResponseArray = photosResponse
+        print("photosResponseArray \(photosResponseArray.count)")
         photosCollectionView.reloadData()
     }
 
