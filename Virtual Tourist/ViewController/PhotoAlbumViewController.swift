@@ -17,6 +17,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     @IBOutlet weak var btnNewCollection: UIButton!
 
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
+    
     @IBAction func actionNewCollection(_ sender: Any) {
     }
 
@@ -27,6 +29,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        setCollectionViewCellDimensions(photosCollectionView)
 
         photosCollectionView.delegate = self
         photosCollectionView.dataSource = self
@@ -63,7 +67,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                     VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.photoURL)!,
                                             successHandler: { (data: Data) in
 
-                                                print("get photo")
                                                 let photo = Photo(context: self.dataController.viewContext)
                                                 photo.photoID = photoResponse.id
                                                 photo.photoURL = url
@@ -77,6 +80,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                                     }
                                                 } catch {
                                                     // todo handle with meaningful info to the user
+                                                    print("get photo error \(error)")
+
 
                                                 }
 
@@ -130,7 +135,20 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             }
         }
 
-
     }
+
+    // measures the width of the view passed as param and divides it by the number of cells per row
+   private func setCollectionViewCellDimensions(_ view: UIView) {
+
+        let space : CGFloat = 3
+        let numberOfItemsPerRow : CGFloat = 3
+
+        let dimension = (view.frame.size.width - (space * (numberOfItemsPerRow - 1))) / numberOfItemsPerRow
+
+        flowLayout.minimumInteritemSpacing = space
+        flowLayout.minimumLineSpacing = space
+        flowLayout.itemSize = CGSize(width: dimension, height: dimension)
+    }
+
 
 }

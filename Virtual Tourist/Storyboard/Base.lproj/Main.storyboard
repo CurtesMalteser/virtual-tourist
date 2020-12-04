@@ -76,7 +76,7 @@
                                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" horizontalHuggingPriority="249" verticalHuggingPriority="249" horizontalCompressionResistancePriority="749" verticalCompressionResistancePriority="749" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Jwp-Uj-MeT">
                                         <rect key="frame" x="0.0" y="144" width="414" height="584"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                        <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="7Sh-Tr-Xx3">
+                                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="7Sh-Tr-Xx3">
                                             <size key="itemSize" width="128" height="128"/>
                                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
@@ -129,6 +129,7 @@
                     <navigationItem key="navigationItem" id="eGW-Ux-6iA"/>
                     <connections>
                         <outlet property="btnNewCollection" destination="iwu-RW-bBy" id="aT2-IX-nZ2"/>
+                        <outlet property="flowLayout" destination="7Sh-Tr-Xx3" id="WNO-jB-5gs"/>
                         <outlet property="mapView" destination="1qj-ao-wUR" id="WSL-RU-HeL"/>
                         <outlet property="photosCollectionView" destination="Jwp-Uj-MeT" id="qIw-dI-y66"/>
                     </connections>
