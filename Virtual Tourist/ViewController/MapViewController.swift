@@ -97,7 +97,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
         do {
             try dataController.viewContext.save()
-
         } catch {
             // todo handle with meaningful info to the user
         }
