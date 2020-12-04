@@ -13,9 +13,18 @@ struct PhotosSearch: Codable {
 }
 
 struct Photos: Codable {
-    let page, pages, perpage: Int
+    let page, pages, perPage: Int
     let total: String
     let photo: [PhotoResponse]
+
+    enum CodingKeys: String, CodingKey {
+        case page = "page"
+        case pages = "pages"
+        case perPage = "perpage"
+        case total = "total"
+        case photo = "photo"
+    }
+
 }
 
 struct PhotoResponse: Codable {
