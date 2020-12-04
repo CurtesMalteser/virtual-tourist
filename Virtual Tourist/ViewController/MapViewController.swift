@@ -20,6 +20,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        travelLocationsMap.delegate = self
         travelLocationsMap.addGestureRecognizer(longPressRecogniser)
 
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
@@ -49,10 +50,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         let touchPoint = gestureRecognizer.location(in: travelLocationsMap)
         let touchMapCoordinate: CLLocationCoordinate2D = travelLocationsMap.convert(touchPoint, toCoordinateFrom: travelLocationsMap)
 
-        addStudentsPointAnnotation(mapView: travelLocationsMap, coordinates: touchMapCoordinate)
+        addPinPointAnnotation(mapView: travelLocationsMap, coordinates: touchMapCoordinate)
     }
 
-    private func addStudentsPointAnnotation(mapView: MKMapView, coordinates: CLLocationCoordinate2D) {
+    private func addPinPointAnnotation(mapView: MKMapView, coordinates: CLLocationCoordinate2D) {
 
         let pin = Pin(context: dataController.viewContext)
         pin.latitude = coordinates.latitude
@@ -75,6 +76,20 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         mapView.addAnnotation(annotations)
     }
 
+    func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
+
+        let latitude = view.annotation?.coordinate.latitude
+        let longitude = view.annotation?.coordinate.longitude
+
+        print("longitude: \(String(describing: longitude)) \nlatitude: \(String(describing: latitude)) ")
+
+        let pin = Pin(context: dataController.viewContext)
+        pin.latitude = latitude!
+        pin.longitude = longitude!
+
+        pushPhotoAlbumViewController(pin: pin)
+    }
+
     // Unused and added to be used on next VC
     private func deletePin(pin: Pin) {
 
@@ -93,5 +108,18 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         longPressRecogniser.minimumPressDuration = 1.0
         return longPressRecogniser
     }
+
+    private func pushPhotoAlbumViewController(pin: Pin) {
+
+        pushViewControllerWithInject(storyboard: storyboard,
+                identifier: PhotoAlbumViewController.identifier,
+                navigationController: navigationController) { viewController in
+            let photoAlbumViewController = viewController as! PhotoAlbumViewController
+            photoAlbumViewController.pin = pin
+            photoAlbumViewController.dataController = self.dataController
+        }
+
+    }
+
 }
 

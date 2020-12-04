@@ -14,6 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     let dataController: DataController = DataController(modelName: "VirtualTourist")
+    lazy var apiKey: String = initApiKey()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -69,6 +70,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return container
     }()*/
 
+
+    private func initApiKey() -> String {
+        guard let filePath = Bundle.main.path(forResource: "Secrets", ofType: "plist")
+                else {
+            fatalError("Secrets.plist not found.")
+        }
+
+        let plist = NSDictionary(contentsOfFile: filePath)
+
+        guard let key = plist?.object(forKey: "apiKey") as? String else {
+            fatalError("'apiKey' not found on 'Secrets.plist' file.")
+        }
+
+        return key
+    }
 
 }
 
