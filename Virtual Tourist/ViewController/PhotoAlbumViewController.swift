@@ -23,10 +23,28 @@ class PhotoAlbumViewController: UIViewController {
                 latitude: pin.latitude,
                 longitude: pin.longitude).url,
                 successHandler: {
-                    (data: PhotosSearch) in
+                    (photosSearch: PhotosSearch) in
 
-                    print("data \(data)")
+                    print("photosSearch \(photosSearch)")
 
+                    photosSearch.photos.photo.forEach { photo in
+
+                        let url = Endpoint
+                                .fetchPhotoURLs(apiKey: apiKey, photoResponse: photo)
+                                .url
+
+                        print("url \(url)")
+
+                        VirtualTouristAPI.executeDataTask(url: url,
+                                successHandler: { (photoSizeResponse: PhotoSizeResponse) in
+
+                                    print("photoSizeResponse \(photoSizeResponse)")
+
+
+                                }, errorHandler: { error in
+                            print(error)
+                        })
+                    }
                 },
                 errorHandler: {
                     error in

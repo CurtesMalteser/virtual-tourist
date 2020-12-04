@@ -62,7 +62,7 @@ extension Endpoint {
 
         let endpointQueryItems = [
             URLQueryItem(
-                    name: method,
+                    name: photoID,
                     value: String(photo.id)
             )
         ]

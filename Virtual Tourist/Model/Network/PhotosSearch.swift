@@ -32,3 +32,36 @@ struct PhotoResponse: Codable {
     let farm: Int
     let title: String
 }
+
+// MARK: PhotoSizeResponse
+// Used to parse the JSON response for each PhotoResponse id
+struct PhotoSizeResponse: Codable {
+    let sizes: Sizes
+    let stat: String
+}
+
+// MARK: - Sizes
+struct Sizes: Codable {
+    let canBlog, canPrint, canDownload: Int
+    let photoSize: [PhotoSize]
+
+    enum CodingKeys: String, CodingKey {
+        case canBlog = "canblog"
+        case canPrint = "canprint"
+        case canDownload = "candownload"
+        case photoSize = "size"
+    }
+}
+
+// MARK: - PhotoSize
+struct PhotoSize: Codable {
+    let label: String
+    let width, height: Int
+    let source: String
+    let url: String
+    let media: Media
+}
+
+enum Media: String, Codable {
+    case photo = "photo"
+}
