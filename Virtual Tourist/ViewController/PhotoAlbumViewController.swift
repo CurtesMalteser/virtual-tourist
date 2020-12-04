@@ -31,9 +31,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         photosCollectionView.delegate = self
         photosCollectionView.dataSource = self
 
-        fetchPhotosCollectionView()
-
-
+        fetchPhotosCollectionViewForPin(pin)
 
     }
 
@@ -48,7 +46,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                 successHandler: {
                     (photosSearch: PhotosSearch) in
 
-                    photosSearch.photos.photo.forEach({ photoResponse in
+                    photosSearch.photos.photoListResponse?.forEach({ photoResponse in
 
                         let url = Endpoint
                                 .fetchPhotoURLs(apiKey: apiKey, photoResponse: photoResponse)
@@ -57,14 +55,15 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                         VirtualTouristAPI.executeDataTask(url: url,
                                 successHandler: { (photoSizeResponse: PhotoSizeResponse) in
 
-                                    let largeSize: PhotoSize = photoSizeResponse.sizes.photoSize.first { size in
+                                    let largeSize: PhotoSize = photoSizeResponse.sizes!.photoSize.first { size in
                                         size.size == PhotoSizeEnum.large
-                                    } ?? photoSizeResponse.sizes.photoSize.last!
+                                    } ?? photoSizeResponse.sizes?.photoSize.last! as! PhotoSize
 
 
-                                    VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.source)!,
+                                    VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.photoURL)!,
                                             successHandler: { (data: Data) in
 
+                                                print("get photo")
                                                 let photo = Photo(context: self.dataController.viewContext)
                                                 photo.photoID = photoResponse.id
                                                 photo.photoURL = url
@@ -73,6 +72,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                                 do {
                                                     try self.dataController.viewContext.save()
                                                     DispatchQueue.main.async {
+                                                        self.photosArray.append(photo)
                                                         self.photosCollectionView.reloadData()
                                                     }
                                                 } catch {
@@ -115,9 +115,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
 
-    private func fetchPhotosCollectionView() {
+    private func fetchPhotosCollectionViewForPin(_ pin: Pin) {
 
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
+
 
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
             if (result.count > 0) {
