@@ -9,7 +9,8 @@ import UIKit
 import CoreData
 import MapKit
 
-class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource,
+        NSFetchedResultsControllerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
 
@@ -18,7 +19,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     @IBOutlet weak var btnNewCollection: UIButton!
 
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
-    
+
     @IBAction func actionNewCollection(_ sender: Any) {
     }
 
@@ -26,6 +27,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     var pin: Pin!
     var dataController: DataController!
     var photosArray: [Photo] = []
+    var fetchedResultsController: NSFetchedResultsController<Photo>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +39,34 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
         fetchPhotosCollectionViewForPin(pin)
 
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "photoID", ascending: true)]
+
+        fetchedResultsController = NSFetchedResultsController(
+                fetchRequest: fetchRequest,
+                managedObjectContext: dataController.viewContext,
+                sectionNameKeyPath: nil,
+                cacheName: nil
+        )
+
+        fetchedResultsController.delegate = self
+
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            print("performFetch: \(error)")
+        }
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        fetchedResultsController = nil
     }
 
     private func fetchPhotosForPin() {
@@ -138,10 +168,10 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     // measures the width of the view passed as param and divides it by the number of cells per row
-   private func setCollectionViewCellDimensions(_ view: UIView) {
+    private func setCollectionViewCellDimensions(_ view: UIView) {
 
-        let space : CGFloat = 3
-        let numberOfItemsPerRow : CGFloat = 3
+        let space: CGFloat = 3
+        let numberOfItemsPerRow: CGFloat = 3
 
         let dimension = (view.frame.size.width - (space * (numberOfItemsPerRow - 1))) / numberOfItemsPerRow
 
