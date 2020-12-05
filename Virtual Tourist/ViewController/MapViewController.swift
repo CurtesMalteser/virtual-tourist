@@ -81,13 +81,19 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         let latitude = view.annotation?.coordinate.latitude
         let longitude = view.annotation?.coordinate.longitude
 
-        print("longitude: \(String(describing: longitude)) \nlatitude: \(String(describing: latitude)) ")
+        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
 
-        let pin = Pin(context: dataController.viewContext)
-        pin.latitude = latitude!
-        pin.longitude = longitude!
+        let subPredicates = [
+            NSPredicate(format: "latitude == %@", String(latitude!)),
+            NSPredicate(format: "longitude == %@", String(longitude!))
+        ]
 
-        pushPhotoAlbumViewController(pin: pin)
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+
+        let pin = try? dataController.viewContext.fetch(fetchRequest).first
+
+        pushPhotoAlbumViewController(pin: pin!)
+
     }
 
     // Unused and added to be used on next VC

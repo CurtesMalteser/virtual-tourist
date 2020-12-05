@@ -53,8 +53,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
 
         let subPredicates = [
-            NSPredicate(format: "pin.latitude == %@", pin.latitude),
-            NSPredicate(format: "pin.longitude == %@", pin.longitude),
+            NSPredicate(format: "pin == %@", pin),
         ]
 
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
@@ -105,13 +104,13 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                     VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.photoURL)!,
                                             successHandler: { (data: Data) in
 
-                                                let photo = Photo(context: self.dataController.viewContext)
-                                                photo.pin = self.pin
-                                                photo.photoID = photoResponse.id
-                                                photo.photoURL = url
-                                                photo.photo = data
-
                                                 do {
+                                                    let photo = Photo(context: self.dataController.viewContext)
+                                                    photo.pin = self.pin
+                                                    photo.photoID = photoResponse.id
+                                                    photo.photoURL = url
+                                                    photo.photo = data
+
                                                     try self.dataController.viewContext.save()
                                                 } catch {
                                                     // todo handle with meaningful info to the user
