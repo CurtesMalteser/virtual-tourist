@@ -35,7 +35,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         setCollectionViewCellDimensions(photosCollectionView)
 
         photosCollectionView.delegate = self
-        photosCollectionView.dataSource = self
+
 
         fetchPhotosCollectionViewForPin(pin)
 
@@ -43,7 +43,15 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        initFetchPhotosResults()
+    }
 
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        fetchedResultsController = nil
+    }
+
+    private func initFetchPhotosResults() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "photoID", ascending: true)]
@@ -60,13 +68,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         do {
             try fetchedResultsController.performFetch()
         } catch {
-            print("performFetch: \(error)")
+            fatalError("Could not perform fetch: \n\(error.localizedDescription)")
         }
-    }
-
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        fetchedResultsController = nil
     }
 
     private func fetchPhotosForPin() {
