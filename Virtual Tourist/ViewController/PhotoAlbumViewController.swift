@@ -97,21 +97,25 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                     VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.photoURL)!,
                                             successHandler: { (data: Data) in
 
-                                                let photo = Photo(context: self.dataController.viewContext)
-                                                photo.photoID = photoResponse.id
-                                                photo.photoURL = url
-                                                photo.photo = data
+                                                DispatchQueue.main.async {
+                                                    do {
 
-                                                do {
-                                                    try self.dataController.viewContext.save()
-                                                    DispatchQueue.main.async {
+                                                        print("pin \(self.pin)")
+                                                        let photo = Photo(context: self.dataController.viewContext)
+                                                        photo.pin = self.pin
+                                                        photo.photoID = photoResponse.id
+                                                        photo.photoURL = url
+                                                        photo.photo = data
+                                                        try self.dataController.viewContext.save()
+
                                                         self.photosArray.append(photo)
                                                         self.photosCollectionView.reloadData()
-                                                    }
-                                                } catch {
-                                                    // todo handle with meaningful info to the user
-                                                    print("get photo error \(error)")
 
+                                                    } catch {
+                                                        // todo handle with meaningful info to the user
+                                                        print("get photo error \(error)")
+
+                                                    }
 
                                                 }
 
@@ -153,14 +157,25 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     private func fetchPhotosCollectionViewForPin(_ pin: Pin) {
 
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
+
+        let subPredicates = [
+            NSPredicate(format: "pin.latitude == %@", pin.latitude),
+            NSPredicate(format: "pin.longitude == %@", pin.longitude),
+        ]
+
+
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+
+        fetchRequest.predicate = predicate
 
 
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
             if (result.count > 0) {
+                print("read from db")
                 self.photosArray = result
                 photosCollectionView.reloadData()
             } else {
+                print("fetch from api")
                 fetchPhotosForPin()
             }
         }
