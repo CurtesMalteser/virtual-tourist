@@ -37,8 +37,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         photosCollectionView.delegate = self
         photosCollectionView.dataSource = self
 
-        fetchPhotosForPin()
-
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -53,10 +51,15 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     private func initFetchPhotosResults() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "photoID", ascending: false)]
 
-        print("ok")
+        let subPredicates = [
+            NSPredicate(format: "pin.latitude == %@", pin.latitude),
+            NSPredicate(format: "pin.longitude == %@", pin.longitude),
+        ]
+
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "photoID", ascending: false)]
 
         fetchedResultsController = NSFetchedResultsController(
                 fetchRequest: fetchRequest,
@@ -103,6 +106,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                             successHandler: { (data: Data) in
 
                                                 let photo = Photo(context: self.dataController.viewContext)
+                                                photo.pin = self.pin
                                                 photo.photoID = photoResponse.id
                                                 photo.photoURL = url
                                                 photo.photo = data
@@ -113,11 +117,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                                     // todo handle with meaningful info to the user
                                                     print("get photo error \(error)")
                                                 }
-
                                             }, errorHandler: { error in
-                                    }
-                                    )
-
+                                        print(error)
+                                    })
                                 }, errorHandler: { error in
                             print(error)
                         })
@@ -143,13 +145,18 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-         fetchedResultsController.sections?.count ?? 1
+        fetchedResultsController.sections?.count ?? 1
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        fetchedResultsController.sections?[0].numberOfObjects ?? 0
-    }
+        let photosCount = fetchedResultsController.sections?[0].numberOfObjects ?? 0
 
+        if (photosCount == 0) {
+            fetchPhotosForPin()
+        }
+
+        return photosCount
+    }
 
     // measures the width of the view passed as param and divides it by the number of cells per row
     private func setCollectionViewCellDimensions(_ view: UIView) {
