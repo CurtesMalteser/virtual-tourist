@@ -29,9 +29,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
             if (result.count > 0) {
                 result.forEach { pin in
-                    addPinToMap(
-                            coordinates: CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude),
-                            mapView: travelLocationsMap)
+                    travelLocationsMap.addPinToMap(
+                            coordinates: CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude))
                 }
             }
         }
@@ -62,18 +61,12 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
         do {
             try dataController.viewContext.save()
-            addPinToMap(coordinates: coordinates, mapView: mapView)
+            // todo update from reactive changes
+            mapView.addPinToMap(coordinates: coordinates)
         } catch {
             // todo handle with meaningful info to the user
         }
 
-    }
-
-    // TODO: store the CLLocationCoordinate2D instead of lat and long
-    private func addPinToMap(coordinates: CLLocationCoordinate2D, mapView: MKMapView) {
-        let annotations: MKPointAnnotation = MKPointAnnotation()
-        annotations.coordinate = coordinates
-        mapView.addAnnotation(annotations)
     }
 
     func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
@@ -94,18 +87,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
         pushPhotoAlbumViewController(pin: pin!)
 
-    }
-
-    // Unused and added to be used on next VC
-    private func deletePin(pin: Pin) {
-
-        dataController.viewContext.delete(pin)
-
-        do {
-            try dataController.viewContext.save()
-        } catch {
-            // todo handle with meaningful info to the user
-        }
     }
 
     private func initLongPressGestureRecognizer() -> UILongPressGestureRecognizer {
