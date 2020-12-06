@@ -50,6 +50,10 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         camera.centerCoordinate = coordinates
         mapView.setCamera(camera, animated: false)
 
+        mapView.isZoomEnabled = false
+        mapView.isScrollEnabled = false
+        mapView.isUserInteractionEnabled = false
+
         mapView.addPinToMap(coordinates: coordinates)
     }
 
