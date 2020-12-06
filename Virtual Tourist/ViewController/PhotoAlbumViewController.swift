@@ -9,8 +9,7 @@ import UIKit
 import CoreData
 import MapKit
 
-class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource,
-        NSFetchedResultsControllerDelegate {
+class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
 
     @IBOutlet weak var mapView: MKMapView!
 
@@ -21,6 +20,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
 
     @IBAction func actionNewCollection(_ sender: Any) {
+        fetchPhotosForPin()
     }
 
     static let identifier: String = "PhotoAlbumViewController"
@@ -157,6 +157,10 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         return photosCount
     }
 
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        deletePhoto(at: indexPath)
+    }
+
     // measures the width of the view passed as param and divides it by the number of cells per row
     private func setCollectionViewCellDimensions(_ view: UIView) {
 
@@ -170,4 +174,31 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         flowLayout.itemSize = CGSize(width: dimension, height: dimension)
     }
 
+    private func deletePhoto(at indexPath: IndexPath) {
+        let photoToDelete = fetchedResultsController.object(at: indexPath)
+        dataController.viewContext.delete(photoToDelete)
+        try? dataController.viewContext.save()
+    }
+
+}
+
+extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
+
+    public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        photosCollectionView.reloadData()
+    }
+
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+
+        switch type {
+        case .insert:
+            photosCollectionView.insertItems(at: [newIndexPath!])
+        case .delete:
+            photosCollectionView.deleteItems(at: [indexPath!])
+        case .update:
+            break // handle the update by replacing images placeholder
+        @unknown default:
+            break
+        }
+    }
 }
