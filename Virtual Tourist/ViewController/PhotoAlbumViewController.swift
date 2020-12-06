@@ -59,7 +59,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        initFetchPhotosResults()
+        initFetchPhotosController()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -67,14 +67,13 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         fetchedResultsController = nil
     }
 
-    private func initFetchPhotosResults() {
+    /**
+     Initializes the fetchedResultsController and fetch the Photo's for Pin.
+    */
+    private func initFetchPhotosController() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
 
-        let subPredicates = [
-            NSPredicate(format: "pin == %@", pin),
-        ]
-
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+        fetchRequest.predicate = NSPredicate(format: "pin == %@", pin)
 
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "photoID", ascending: false)]
 
@@ -82,7 +81,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                 fetchRequest: fetchRequest,
                 managedObjectContext: dataController.viewContext,
                 sectionNameKeyPath: nil,
-                cacheName: nil
+                cacheName: "\(pin.latitude)-\(pin.longitude)"
         )
 
         fetchedResultsController.delegate = self
@@ -97,7 +96,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     private func fetchPhotosForPin() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let apiKey = appDelegate.apiKey
-
 
         VirtualTouristAPI.executeDataTask(url: Endpoint.searchPhotoForCoordinates(apiKey: apiKey,
                 latitude: pin.latitude,
@@ -122,17 +120,22 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                     VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.photoURL)!,
                                             successHandler: { (data: Data) in
 
-                                                do {
-                                                    let photo = Photo(context: self.dataController.viewContext)
-                                                    photo.pin = self.pin
-                                                    photo.photoID = photoResponse.id
-                                                    photo.photoURL = url
-                                                    photo.photo = data
+                                                let backgroundContext = self.dataController.backgroundContext
+                                                backgroundContext.perform {
 
-                                                    try self.dataController.viewContext.save()
-                                                } catch {
-                                                    // todo handle with meaningful info to the user
-                                                    print("get photo error \(error)")
+                                                    let backgroundPin = backgroundContext.object(with: self.pin.objectID) as! Pin
+                                                    do {
+                                                        let photo = Photo(context: backgroundContext)
+                                                        photo.pin = backgroundPin
+                                                        photo.photoID = photoResponse.id
+                                                        photo.photoURL = url
+                                                        photo.photo = data
+
+                                                        try backgroundContext.save()
+                                                    } catch {
+                                                        // todo handle with meaningful info to the user
+                                                        print("get photo error \(error)")
+                                                    }
                                                 }
                                             }, errorHandler: { error in
                                         print(error)
@@ -214,7 +217,7 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         case .delete:
             photosCollectionView.deleteItems(at: [indexPath!])
         case .update:
-            break // handle the update by replacing images placeholder
+            photosCollectionView.reloadItems(at: [indexPath!])
         @unknown default:
             break
         }
