@@ -37,6 +37,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         photosCollectionView.delegate = self
         photosCollectionView.dataSource = self
 
+        mapView.addPinToMap(coordinates: CLLocationCoordinate2D(
+                latitude: pin.latitude,
+                longitude: pin.longitude)
+        )
+
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -98,7 +103,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
                                     let largeSize: PhotoSize = photoSizeResponse.sizes!.photoSize.first { size in
                                         size.size == PhotoSizeEnum.large
-                                    } ?? photoSizeResponse.sizes?.photoSize.last! as! PhotoSize
+                                    } ?? photoSizeResponse.sizes!.photoSize.last!
 
 
                                     VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.photoURL)!,
