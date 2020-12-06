@@ -37,11 +37,20 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         photosCollectionView.delegate = self
         photosCollectionView.dataSource = self
 
-        mapView.addPinToMap(coordinates: CLLocationCoordinate2D(
+        setupMapView(pin)
+
+    }
+
+    private func setupMapView(_ pin: Pin) {
+        let coordinates = CLLocationCoordinate2D(
                 latitude: pin.latitude,
                 longitude: pin.longitude)
-        )
 
+        let camera = mapView.camera
+        camera.centerCoordinate = coordinates
+        mapView.setCamera(camera, animated: false)
+
+        mapView.addPinToMap(coordinates: coordinates)
     }
 
     override func viewWillAppear(_ animated: Bool) {
