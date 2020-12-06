@@ -82,7 +82,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                 fetchRequest: fetchRequest,
                 managedObjectContext: dataController.viewContext,
                 sectionNameKeyPath: nil,
-                cacheName: nil
+                cacheName: "\(pin.latitude)-\(pin.longitude)"
         )
 
         fetchedResultsController.delegate = self
@@ -214,7 +214,7 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         case .delete:
             photosCollectionView.deleteItems(at: [indexPath!])
         case .update:
-            break // handle the update by replacing images placeholder
+            photosCollectionView.reloadItems(at: [indexPath!])
         @unknown default:
             break
         }
