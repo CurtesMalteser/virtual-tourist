@@ -31,7 +31,7 @@ class VirtualTouristAPI {
         task.resume()
     }
 
-    class func executeDataDataTask(url: URL, successHandler: @escaping (Data) -> Void, errorHandler: @escaping (Error?) -> Void) {
+    class func executeFetchPhotoDataTask(url: URL, successHandler: @escaping (Data) -> Void, errorHandler: @escaping (Error?) -> Void) -> URLSessionDataTask{
 
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data else {
@@ -42,6 +42,8 @@ class VirtualTouristAPI {
         }
 
         task.resume()
+
+        return task
     }
 
 }

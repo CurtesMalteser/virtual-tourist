@@ -94,6 +94,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     private func fetchPhotosForPin() {
+
+        print("AJDB -> fetchPhotosForPin")
+
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let apiKey = appDelegate.apiKey
 
@@ -117,7 +120,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                     } ?? photoSizeResponse.sizes!.photoSize.last!
 
 
-                                    VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.photoURL)!,
+                             VirtualTouristAPI.executeFetchPhotoDataTask(url: URL(string: largeSize.photoURL)!,
                                             successHandler: { (data: Data) in
 
                                                 let backgroundContext = self.dataController.backgroundContext
