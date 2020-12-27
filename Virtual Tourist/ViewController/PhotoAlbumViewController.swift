@@ -24,10 +24,14 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     static let identifier: String = "PhotoAlbumViewController"
+
     var pin: Pin!
     var dataController: DataController!
+    var photosController: PhotosController!
 
     var fetchedResultsController: NSFetchedResultsController<Photo>!
+
+    lazy var apiKey: String = (UIApplication.shared.delegate as! AppDelegate).apiKey
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -93,65 +97,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         }
     }
 
-    private func fetchPhotosForPin() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let apiKey = appDelegate.apiKey
-
-        VirtualTouristAPI.executeDataTask(url: Endpoint.searchPhotoForCoordinates(apiKey: apiKey,
-                latitude: pin.latitude,
-                longitude: pin.longitude).url,
-                successHandler: {
-                    (photosSearch: PhotosSearch) in
-
-                    photosSearch.photos.photoListResponse?.forEach({ photoResponse in
-
-                        let url = Endpoint
-                                .fetchPhotoURLs(apiKey: apiKey, photoResponse: photoResponse)
-                                .url
-
-                        VirtualTouristAPI.executeDataTask(url: url,
-                                successHandler: { (photoSizeResponse: PhotoSizeResponse) in
-
-                                    let largeSize: PhotoSize = photoSizeResponse.sizes!.photoSize.first { size in
-                                        size.size == PhotoSizeEnum.large
-                                    } ?? photoSizeResponse.sizes!.photoSize.last!
-
-
-                                    VirtualTouristAPI.executeDataDataTask(url: URL(string: largeSize.photoURL)!,
-                                            successHandler: { (data: Data) in
-
-                                                let backgroundContext = self.dataController.backgroundContext
-                                                backgroundContext.perform {
-
-                                                    let backgroundPin = backgroundContext.object(with: self.pin.objectID) as! Pin
-                                                    do {
-                                                        let photo = Photo(context: backgroundContext)
-                                                        photo.pin = backgroundPin
-                                                        photo.photoID = photoResponse.id
-                                                        photo.photoURL = url
-                                                        photo.photo = data
-
-                                                        try backgroundContext.save()
-                                                    } catch {
-                                                        // todo handle with meaningful info to the user
-                                                        print("get photo error \(error)")
-                                                    }
-                                                }
-                                            }, errorHandler: { error in
-                                        print(error)
-                                    })
-                                }, errorHandler: { error in
-                            print(error)
-                        })
-                    })
-                },
-                errorHandler: {
-                    error in
-                    print(error)
-                })
-    }
-
-
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as! PhotoCollectionViewCell
 
@@ -159,6 +104,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
         if let photo = photoEntry.photo {
             cell.imageView.image = UIImage(data: photo)
+        } else {
+            cell.imageView.image = UIImage(named: "ImagePlaceholder")
+            photosController.fetchPhotoForSize(photo: photoEntry)
         }
 
         return cell
@@ -199,6 +147,10 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         let photoToDelete = fetchedResultsController.object(at: indexPath)
         dataController.viewContext.delete(photoToDelete)
         try? dataController.viewContext.save()
+    }
+
+    private func fetchPhotosForPin() {
+        photosController.fetchPhotosForPin(pin: self.pin, apiKey: apiKey)
     }
 
 }

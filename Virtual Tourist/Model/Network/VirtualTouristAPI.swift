@@ -9,11 +9,12 @@ import Foundation
 
 class VirtualTouristAPI {
 
-    class func executeDataTask<T: Codable>(url: URL, successHandler: @escaping (T) -> Void, errorHandler: @escaping (Error?) -> Void) {
+    func executeDataTask<T: Codable>(url: URL, successHandler: @escaping (T) -> Void, errorHandler: @escaping (Error?) -> Void) {
 
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data else {
                 print("no data")
+                errorHandler(error)
                 return
             }
 
@@ -31,17 +32,20 @@ class VirtualTouristAPI {
         task.resume()
     }
 
-    class func executeDataDataTask(url: URL, successHandler: @escaping (Data) -> Void, errorHandler: @escaping (Error?) -> Void) {
+    func executeFetchPhotoDataTask(url: URL, successHandler: @escaping (Data) -> Void, errorHandler: @escaping (Error?) -> Void) -> URLSessionDataTask {
 
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data else {
                 print("no data")
+                errorHandler(error)
                 return
             }
             successHandler(data)
         }
 
         task.resume()
+
+        return task
     }
 
 }
