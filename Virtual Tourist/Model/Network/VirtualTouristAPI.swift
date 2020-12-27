@@ -9,7 +9,7 @@ import Foundation
 
 class VirtualTouristAPI {
 
-    class func executeDataTask<T: Codable>(url: URL, successHandler: @escaping (T) -> Void, errorHandler: @escaping (Error?) -> Void) {
+    func executeDataTask<T: Codable>(url: URL, successHandler: @escaping (T) -> Void, errorHandler: @escaping (Error?) -> Void) {
 
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data else {
