@@ -24,8 +24,10 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     static let identifier: String = "PhotoAlbumViewController"
+
     var pin: Pin!
     var dataController: DataController!
+    var photosController: PhotosController!
 
     var fetchedResultsController: NSFetchedResultsController<Photo>!
 
@@ -144,27 +146,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                 })
     }
 
-    private func fetchPhotoForSize(photo: Photo) -> URLSessionDataTask {
-
-        VirtualTouristAPI.executeFetchPhotoDataTask(url: photo.photoURL!,
-                successHandler: { (data: Data) in
-
-                    let backgroundContext = self.dataController.backgroundContext
-                    backgroundContext.perform {
-                        do {
-                            photo.photo = data
-                            try backgroundContext.save()
-                        } catch {
-                            // todo handle with meaningful info to the user
-                            print("get photo error \(error)")
-                        }
-                    }
-                }, errorHandler: { error in
-            print(error)
-        })
-    }
-
-
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as! PhotoCollectionViewCell
 
@@ -174,7 +155,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             cell.imageView.image = UIImage(data: photo)
         } else {
             cell.imageView.image = UIImage(named: "ImagePlaceholder")
-            fetchPhotoForSize(photo: photoEntry)
+            photosController.fetchPhotoForSize(photo: photoEntry)
         }
 
         return cell

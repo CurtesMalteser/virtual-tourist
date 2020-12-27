@@ -103,6 +103,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let photoAlbumViewController = viewController as! PhotoAlbumViewController
             photoAlbumViewController.pin = pin
             photoAlbumViewController.dataController = self.dataController
+            photoAlbumViewController.photosController = PhotosController(virtualTouristAPI: VirtualTouristAPI(), dataController: self.dataController)
         }
 
     }
