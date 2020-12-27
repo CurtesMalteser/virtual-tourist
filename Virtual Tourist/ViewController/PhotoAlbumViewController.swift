@@ -94,9 +94,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     private func fetchPhotosForPin() {
-
-        print("AJDB -> fetchPhotosForPin")
-
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let apiKey = appDelegate.apiKey
 
@@ -119,30 +116,23 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                                         size.size == PhotoSizeEnum.large
                                     } ?? photoSizeResponse.sizes!.photoSize.last!
 
+                                    let backgroundContext = self.dataController.backgroundContext
+                                    backgroundContext.perform {
 
-                             VirtualTouristAPI.executeFetchPhotoDataTask(url: URL(string: largeSize.photoURL)!,
-                                            successHandler: { (data: Data) in
+                                        let backgroundPin = backgroundContext.object(with: self.pin.objectID) as! Pin
+                                        do {
+                                            let photo = Photo(context: backgroundContext)
+                                            photo.pin = backgroundPin
+                                            photo.photoID = photoResponse.id
+                                            photo.photoURL = URL(string: largeSize.photoURL)
+                                            photo.photo = nil
 
-                                                let backgroundContext = self.dataController.backgroundContext
-                                                backgroundContext.perform {
-
-                                                    let backgroundPin = backgroundContext.object(with: self.pin.objectID) as! Pin
-                                                    do {
-                                                        let photo = Photo(context: backgroundContext)
-                                                        photo.pin = backgroundPin
-                                                        photo.photoID = photoResponse.id
-                                                        photo.photoURL = url
-                                                        photo.photo = data
-
-                                                        try backgroundContext.save()
-                                                    } catch {
-                                                        // todo handle with meaningful info to the user
-                                                        print("get photo error \(error)")
-                                                    }
-                                                }
-                                            }, errorHandler: { error in
-                                        print(error)
-                                    })
+                                            try backgroundContext.save()
+                                        } catch {
+                                            // todo handle with meaningful info to the user
+                                            print("get photo error \(error)")
+                                        }
+                                    }
                                 }, errorHandler: { error in
                             print(error)
                         })
@@ -154,6 +144,26 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                 })
     }
 
+    private func fetchPhotoForSize(photo: Photo) -> URLSessionDataTask {
+
+        VirtualTouristAPI.executeFetchPhotoDataTask(url: photo.photoURL!,
+                successHandler: { (data: Data) in
+
+                    let backgroundContext = self.dataController.backgroundContext
+                    backgroundContext.perform {
+                        do {
+                            photo.photo = data
+                            try backgroundContext.save()
+                        } catch {
+                            // todo handle with meaningful info to the user
+                            print("get photo error \(error)")
+                        }
+                    }
+                }, errorHandler: { error in
+            print(error)
+        })
+    }
+
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as! PhotoCollectionViewCell
@@ -162,6 +172,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
         if let photo = photoEntry.photo {
             cell.imageView.image = UIImage(data: photo)
+        } else {
+            cell.imageView.image = UIImage(named: "ImagePlaceholder")
+            fetchPhotoForSize(photo: photoEntry)
         }
 
         return cell
