@@ -9,8 +9,8 @@ import Foundation
 
 class PhotosController {
 
-    private let _virtualTouristAPI: VirtualTouristAPI
-    private let _dataController: DataController
+    private var _virtualTouristAPI: VirtualTouristAPI!
+    private var _dataController: DataController!
 
     init(virtualTouristAPI: VirtualTouristAPI, dataController: DataController) {
         _virtualTouristAPI = virtualTouristAPI
@@ -83,5 +83,9 @@ class PhotosController {
                 })
     }
 
+    deinit {
+        _virtualTouristAPI = nil
+        _dataController = nil
+    }
 
 }

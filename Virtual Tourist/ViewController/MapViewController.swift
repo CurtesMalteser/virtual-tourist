@@ -17,6 +17,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     var dataController: DataController!
 
+    var fetchedResultsController: NSFetchedResultsController<Pin>!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -24,6 +26,15 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         travelLocationsMap.addGestureRecognizer(longPressRecogniser)
 
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
+
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "objectID", ascending: false)]
+
+        fetchedResultsController = NSFetchedResultsController(
+                fetchRequest: fetchRequest,
+                managedObjectContext: dataController.viewContext,
+                sectionNameKeyPath: nil,
+                cacheName: nil
+        )
 
         // TODO: wrap in try catch
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
@@ -35,6 +46,11 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             }
         }
 
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        fetchedResultsController = nil
     }
 
     deinit {
