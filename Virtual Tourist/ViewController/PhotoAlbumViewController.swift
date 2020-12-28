@@ -67,8 +67,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
         fetchedResultsController = nil
+        super.viewDidDisappear(animated)
     }
 
     /**
@@ -150,7 +150,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     private func fetchPhotosForPin() {
-        photosController.fetchPhotosForPin(pin: self.pin, apiKey: apiKey)
+        photosController.fetchPhotosForPin(pin: pin, apiKey: apiKey)
     }
 
 }

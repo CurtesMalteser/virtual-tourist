@@ -9,7 +9,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class MapViewController: UIViewController, MKMapViewDelegate {
+class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
 
     @IBOutlet weak var travelLocationsMap: MKMapView!
 
@@ -24,6 +24,14 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         // Do any additional setup after loading the view.
         travelLocationsMap.delegate = self
         travelLocationsMap.addGestureRecognizer(longPressRecogniser)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        initFetchPinsController()
+    }
+
+    private func initFetchPinsController() {
 
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
 
@@ -36,21 +44,23 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                 cacheName: nil
         )
 
-        // TODO: wrap in try catch
-        if let result = try? dataController.viewContext.fetch(fetchRequest) {
-            if (result.count > 0) {
-                result.forEach { pin in
-                    travelLocationsMap.addPinToMap(
-                            coordinates: CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude))
-                }
-            }
+        fetchedResultsController.delegate = self
+
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            fatalError("Could not perform fetch: \n\(error.localizedDescription)")
         }
 
+        fetchedResultsController.fetchedObjects?.forEach { pin in
+            travelLocationsMap.addPinToMap(
+                    coordinates: CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude))
+        }
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewDidDisappear(_ animated: Bool) {
         fetchedResultsController = nil
+        super.viewDidDisappear(animated)
     }
 
     deinit {
@@ -70,17 +80,16 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     private func addPinPointAnnotation(mapView: MKMapView, coordinates: CLLocationCoordinate2D) {
 
-        let pin = Pin(context: dataController.viewContext)
+        let pin = Pin(context: fetchedResultsController.managedObjectContext)
         pin.latitude = coordinates.latitude
         pin.longitude = coordinates.longitude
 
-
         do {
-            try dataController.viewContext.save()
-            // todo update from reactive changes
+            try fetchedResultsController.managedObjectContext.save()
+
             mapView.addPinToMap(coordinates: coordinates)
         } catch {
-            // todo handle with meaningful info to the user
+            print("Failed save addPinPointAnnotation!")
         }
 
     }
@@ -99,7 +108,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
 
-        let pin = try? dataController.viewContext.fetch(fetchRequest).first
+        let pin = try? fetchedResultsController.managedObjectContext.fetch(fetchRequest).first
 
         pushPhotoAlbumViewController(pin: pin!)
 
@@ -125,4 +134,3 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     }
 
 }
-
