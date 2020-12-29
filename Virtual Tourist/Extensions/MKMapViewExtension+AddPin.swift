@@ -10,9 +10,10 @@ import MapKit
 extension MKMapView {
 
     func addPinToMap(coordinates: CLLocationCoordinate2D) {
-        let annotations: MKPointAnnotation = MKPointAnnotation()
-        annotations.coordinate = coordinates
-        addAnnotation(annotations)
+        let annotation: MKPointAnnotation = MKPointAnnotation()
+        annotation.coordinate = coordinates
+        annotation.title = "pin_label"
+        addAnnotation(annotation)
     }
 
 }

@@ -31,6 +31,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     var fetchedResultsController: NSFetchedResultsController<Photo>!
 
+    lazy var context = fetchedResultsController.managedObjectContext
+
     lazy var apiKey: String = (UIApplication.shared.delegate as! AppDelegate).apiKey
 
     override func viewDidLoad() {
@@ -145,8 +147,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     private func deletePhoto(at indexPath: IndexPath) {
         let photoToDelete = fetchedResultsController.object(at: indexPath)
-        dataController.viewContext.delete(photoToDelete)
-        try? dataController.viewContext.save()
+        context.delete(photoToDelete)
+        try? context.save()
     }
 
     private func fetchPhotosForPin() {

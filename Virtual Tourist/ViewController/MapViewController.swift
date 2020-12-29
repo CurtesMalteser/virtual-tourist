@@ -9,7 +9,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class MapViewController: UIViewController, MKMapViewDelegate {
+class MapViewController: UIViewController {
 
     @IBOutlet weak var travelLocationsMap: MKMapView!
 
@@ -49,7 +49,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         do {
             try fetchedResultsController.performFetch()
         } catch {
-            fatalError("Could not perform fetch: \n\(error.localizedDescription)")
+            fatalError("Could not perform fetch:\n\(error.localizedDescription)")
         }
 
         fetchedResultsController.fetchedObjects?.forEach { pin in
@@ -86,14 +86,63 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
         do {
             try fetchedResultsController.managedObjectContext.save()
-            print("stored pin: latitude \(pin.latitude) longitude \(pin.longitude)")
         } catch {
             print("Failed save addPinPointAnnotation!")
         }
 
     }
 
-    func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
+    private func initLongPressGestureRecognizer() -> UILongPressGestureRecognizer {
+        let longPressRecogniser = UILongPressGestureRecognizer(target: self, action: #selector(MapViewController.handleLongPress(_:)))
+        longPressRecogniser.minimumPressDuration = 0.6
+        return longPressRecogniser
+    }
+
+    private func pushPhotoAlbumViewController(pin: Pin) {
+
+        pushViewControllerWithInject(storyboard: storyboard,
+                identifier: PhotoAlbumViewController.identifier,
+                navigationController: navigationController) { viewController in
+            let photoAlbumViewController = viewController as! PhotoAlbumViewController
+            photoAlbumViewController.pin = pin
+            photoAlbumViewController.dataController = self.dataController
+            photoAlbumViewController.photosController = PhotosController(virtualTouristAPI: VirtualTouristAPI(), dataController: self.dataController)
+        }
+
+    }
+
+}
+
+extension MapViewController: MKMapViewDelegate {
+
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+
+        guard annotation is MKPointAnnotation else {
+            return nil
+        }
+
+        let identifier = "Annotation"
+        let dequeueReusableAnnotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+
+        if let annotationView = dequeueReusableAnnotationView {
+            annotationView.annotation = annotation
+            return annotationView
+        } else {
+            let image = UIImage(named: "ImagePlaceholder")
+
+            let button = UIButton(type: .infoLight)
+            button.setImage(image, for: .normal)
+
+            let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            annotationView.canShowCallout = true
+            annotationView.rightCalloutAccessoryView = button
+
+            return annotationView
+        }
+
+    }
+
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
 
         let latitude = view.annotation?.coordinate.latitude
         let longitude = view.annotation?.coordinate.longitude
@@ -113,29 +162,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     }
 
-    private func initLongPressGestureRecognizer() -> UILongPressGestureRecognizer {
-        let longPressRecogniser = UILongPressGestureRecognizer(target: self, action: #selector(MapViewController.handleLongPress(_:)))
-        longPressRecogniser.minimumPressDuration = 1.0
-        return longPressRecogniser
-    }
-
-    private func pushPhotoAlbumViewController(pin: Pin) {
-
-        pushViewControllerWithInject(storyboard: storyboard,
-                identifier: PhotoAlbumViewController.identifier,
-                navigationController: navigationController) { viewController in
-            let photoAlbumViewController = viewController as! PhotoAlbumViewController
-            photoAlbumViewController.pin = pin
-            photoAlbumViewController.dataController = self.dataController
-            photoAlbumViewController.photosController = PhotosController(virtualTouristAPI: VirtualTouristAPI(), dataController: self.dataController)
-        }
-
-    }
-
-
 }
 
 extension MapViewController: NSFetchedResultsControllerDelegate {
+
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         if (type == .insert) {
             if let pin = controller.object(at: newIndexPath!) as? Pin {
