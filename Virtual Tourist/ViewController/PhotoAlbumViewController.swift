@@ -31,6 +31,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     var fetchedResultsController: NSFetchedResultsController<Photo>!
 
+    lazy var context = fetchedResultsController.managedObjectContext
+
     lazy var apiKey: String = (UIApplication.shared.delegate as! AppDelegate).apiKey
 
     override func viewDidLoad() {
@@ -58,7 +60,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         mapView.isScrollEnabled = false
         mapView.isUserInteractionEnabled = false
 
-        mapView.addPinToMap(coordinates: coordinates)
+        mapView.addPinToMap(pin)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -67,8 +69,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
         fetchedResultsController = nil
+        super.viewDidDisappear(animated)
     }
 
     /**
@@ -105,7 +107,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         if let photo = photoEntry.photo {
             cell.imageView.image = UIImage(data: photo)
         } else {
-            cell.imageView.image = UIImage(named: "ImagePlaceholder")
+            cell.imageView.image = UIImage.imagePlaceholder()
             photosController.fetchPhotoForSize(photo: photoEntry)
         }
 
@@ -145,12 +147,12 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     private func deletePhoto(at indexPath: IndexPath) {
         let photoToDelete = fetchedResultsController.object(at: indexPath)
-        dataController.viewContext.delete(photoToDelete)
-        try? dataController.viewContext.save()
+        context.delete(photoToDelete)
+        try? context.save()
     }
 
     private func fetchPhotosForPin() {
-        photosController.fetchPhotosForPin(pin: self.pin, apiKey: apiKey)
+        photosController.fetchPhotosForPin(pin: pin, apiKey: apiKey)
     }
 
 }

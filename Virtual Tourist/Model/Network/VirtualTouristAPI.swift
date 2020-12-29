@@ -22,7 +22,6 @@ class VirtualTouristAPI {
                 let decoder = JSONDecoder()
                 let data = try decoder.decode(T.self, from: data)
                 successHandler(data)
-
             } catch {
                 errorHandler(error)
             }
@@ -32,8 +31,7 @@ class VirtualTouristAPI {
         task.resume()
     }
 
-    func executeFetchPhotoDataTask(url: URL, successHandler: @escaping (Data) -> Void, errorHandler: @escaping (Error?) -> Void) -> URLSessionDataTask {
-
+    func executeFetchPhotoDataTask(url: URL, successHandler: @escaping (Data) -> Void, errorHandler: @escaping (Error?) -> Void) {
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data else {
                 print("no data")
@@ -45,7 +43,6 @@ class VirtualTouristAPI {
 
         task.resume()
 
-        return task
     }
 
 }
