@@ -107,7 +107,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         if let photo = photoEntry.photo {
             cell.imageView.image = UIImage(data: photo)
         } else {
-            cell.imageView.image = UIImage(named: "ImagePlaceholder")
+            cell.imageView.image = UIImage.imagePlaceholder()
             photosController.fetchPhotoForSize(photo: photoEntry)
         }
 

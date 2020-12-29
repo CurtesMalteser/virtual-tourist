@@ -128,10 +128,10 @@ extension MapViewController: MKMapViewDelegate {
             annotationView.annotation = annotation
             return annotationView
         } else {
-            let image = UIImage(named: "ImagePlaceholder")
+            let btnImage = UIImage.imagePlaceholder()
 
             let button = UIButton(type: .infoLight)
-            button.setImage(image, for: .normal)
+            button.setImage(btnImage, for: .normal)
 
             let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
             annotationView.canShowCallout = true

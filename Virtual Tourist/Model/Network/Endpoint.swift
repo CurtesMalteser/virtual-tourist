@@ -37,7 +37,8 @@ extension Endpoint {
     private static let apiKey = "api_key"
     private static let photoID = "photo_id"
 
-    static func searchPhotoForCoordinates(apiKey key: String, latitude: Double, longitude: Double, radius: Int = 10, perPage: Int = 30) -> Self {
+    // TODO -> set back to 30
+    static func searchPhotoForCoordinates(apiKey key: String, latitude: Double, longitude: Double, radius: Int = 10, perPage: Int = 3) -> Self {
 
         let endpointQueryItems = [
             URLQueryItem(name: "lat",
