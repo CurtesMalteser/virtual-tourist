@@ -20,7 +20,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
 
     @IBAction func actionNewCollection(_ sender: Any) {
-        fetchPhotosForPin()
+        fetchNewCollection()
     }
 
     static let identifier: String = "PhotoAlbumViewController"
@@ -122,7 +122,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         let photosCount = fetchedResultsController.sections?[0].numberOfObjects ?? 0
 
         if (photosCount == 0) {
-            fetchPhotosForPin()
+            fetchPhotosForPin(isNewCollection: pin.pages != 0)
         }
 
         return photosCount
@@ -145,23 +145,46 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         flowLayout.itemSize = CGSize(width: dimension, height: dimension)
     }
 
-    private func deletePhoto(at indexPath: IndexPath) {
+    func deletePhoto(at indexPath: IndexPath) {
         let photoToDelete = fetchedResultsController.object(at: indexPath)
         context.delete(photoToDelete)
         try? context.save()
     }
 
-    private func fetchPhotosForPin() {
-        photosController.fetchPhotosForPin(pin: pin, apiKey: apiKey)
+    private func fetchPhotosForPin(isNewCollection: Bool) {
+        photosController.fetchPhotosForPin(pin: pin,
+                apiKey: apiKey,
+                isNewCollection: isNewCollection)
+    }
+
+    func fetchNewCollection() {
+
+        photosCollectionView.visibleCells.forEach { cell in
+            if let photoCell = cell as? PhotoCollectionViewCell {
+                photoCell.imageView.image = UIImage.imagePlaceholder()
+            }
+        }
+
+        if (!fetchedResultsController.fetchedObjects!.isEmpty) {
+            if let fetchedPhotos = fetchedResultsController.fetchedObjects {
+                fetchedPhotos.forEach { photo in
+                    dataController.viewContext.delete(photo)
+                    do {
+                        try dataController.viewContext.save()
+                    } catch {
+                        print("Failed to delete Photo!")
+                    }
+                }
+            }
+        }
+
+        fetchPhotosForPin(isNewCollection: true)
+
     }
 
 }
 
 extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
-
-    public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        photosCollectionView.reloadData()
-    }
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
@@ -172,8 +195,10 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
             photosCollectionView.deleteItems(at: [indexPath!])
         case .update:
             photosCollectionView.reloadItems(at: [indexPath!])
+        case .move:
+            photosCollectionView.moveItem(at: indexPath!, to: newIndexPath!)
         @unknown default:
-            break
+            fatalError("NSFetchedResultsControllerDelegate did change unknown!")
         }
     }
 }
