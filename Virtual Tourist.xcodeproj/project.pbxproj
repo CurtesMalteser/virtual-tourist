@@ -28,6 +28,7 @@
 		92AB3AFD2574F4F700C641B7 /* Virtual_TouristUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92AB3AFC2574F4F700C641B7 /* Virtual_TouristUITests.swift */; };
 		92AB3B162575341D00C641B7 /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 92AB3B152575341D00C641B7 /* Secrets.plist */; };
 		92E20269259B967B003D45A6 /* UIImage+ImagePlaceHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E20268259B967B003D45A6 /* UIImage+ImagePlaceHolder.swift */; };
+		92E2026E259BA0C5003D45A6 /* Pin+CLPlacemark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E2026D259BA0C5003D45A6 /* Pin+CLPlacemark.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +76,7 @@
 		92AB3AFE2574F4F700C641B7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		92AB3B152575341D00C641B7 /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Secrets.plist; sourceTree = "<group>"; };
 		92E20268259B967B003D45A6 /* UIImage+ImagePlaceHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+ImagePlaceHolder.swift"; sourceTree = "<group>"; };
+		92E2026D259BA0C5003D45A6 /* Pin+CLPlacemark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pin+CLPlacemark.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +130,7 @@
 				71A92EEADB271E467436DEC4 /* UIViewController+Navigation.swift */,
 				924FA6C6257D6EF50060113A /* MKMapViewExtension+AddPin.swift */,
 				92E20268259B967B003D45A6 /* UIImage+ImagePlaceHolder.swift */,
+				92E2026D259BA0C5003D45A6 /* Pin+CLPlacemark.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -359,6 +362,7 @@
 				924FA6602577E6AE0060113A /* PhotoAlbumViewController.swift in Sources */,
 				9220E00B2576C6CD0082E673 /* DataController.swift in Sources */,
 				9220DFF425768D3C0082E673 /* VirtualTourist.xcdatamodeld in Sources */,
+				92E2026E259BA0C5003D45A6 /* Pin+CLPlacemark.swift in Sources */,
 				924FA694257A8F5E0060113A /* PhotoCollectionViewCell.swift in Sources */,
 				924FA67C257950450060113A /* Endpoint.swift in Sources */,
 				924FA677257930830060113A /* VirtualTouristAPI.swift in Sources */,

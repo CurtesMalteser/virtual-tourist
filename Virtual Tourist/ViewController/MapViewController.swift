@@ -53,8 +53,7 @@ class MapViewController: UIViewController {
         }
 
         fetchedResultsController.fetchedObjects?.forEach { pin in
-            travelLocationsMap.addPinToMap(
-                    coordinates: CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude))
+            travelLocationsMap.addPinToMap(pin)
         }
     }
 
@@ -75,20 +74,41 @@ class MapViewController: UIViewController {
         let touchPoint = gestureRecognizer.location(in: travelLocationsMap)
         let touchMapCoordinate: CLLocationCoordinate2D = travelLocationsMap.convert(touchPoint, toCoordinateFrom: travelLocationsMap)
 
-        addPinPointAnnotation(mapView: travelLocationsMap, coordinates: touchMapCoordinate)
+        addPinPointAnnotation(coordinates: touchMapCoordinate)
     }
 
-    private func addPinPointAnnotation(mapView: MKMapView, coordinates: CLLocationCoordinate2D) {
+    private func addPinPointAnnotation(coordinates: CLLocationCoordinate2D) {
 
-        let pin = Pin(context: fetchedResultsController.managedObjectContext)
-        pin.latitude = coordinates.latitude
-        pin.longitude = coordinates.longitude
+        let latitude = coordinates.latitude
+        let longitude = coordinates.longitude
 
-        do {
-            try fetchedResultsController.managedObjectContext.save()
-        } catch {
-            print("Failed save addPinPointAnnotation!")
+        func storePinOnResult() {
+            do {
+                try fetchedResultsController.managedObjectContext.save()
+            } catch {
+                print("Failed save addPinPointAnnotation!")
+            }
         }
+
+        CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: latitude, longitude: longitude),
+                completionHandler: { placemarks, error in
+
+                    let pin = Pin(context: self.fetchedResultsController.managedObjectContext)
+                    pin.latitude = latitude
+                    pin.longitude = longitude
+
+                    if (error != nil) {
+                        pin.setAddressOnPlacemarkError()
+                        storePinOnResult()
+                    }
+
+                    let placemark = placemarks?.first
+                    if let mark = placemark {
+                        pin.setAddressFromPlaceMark(mark)
+                        storePinOnResult()
+                    }
+
+                })
 
     }
 
@@ -169,7 +189,7 @@ extension MapViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         if (type == .insert) {
             if let pin = controller.object(at: newIndexPath!) as? Pin {
-                travelLocationsMap.addPinToMap(coordinates: CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude))
+                travelLocationsMap.addPinToMap(pin)
             }
         }
     }

@@ -60,7 +60,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         mapView.isScrollEnabled = false
         mapView.isUserInteractionEnabled = false
 
-        mapView.addPinToMap(coordinates: coordinates)
+        mapView.addPinToMap(pin)
     }
 
     override func viewWillAppear(_ animated: Bool) {
