@@ -9,7 +9,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
+class MapViewController: UIViewController, MKMapViewDelegate {
 
     @IBOutlet weak var travelLocationsMap: MKMapView!
 
@@ -86,8 +86,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
 
         do {
             try fetchedResultsController.managedObjectContext.save()
-
-            mapView.addPinToMap(coordinates: coordinates)
+            print("stored pin: latitude \(pin.latitude) longitude \(pin.longitude)")
         } catch {
             print("Failed save addPinPointAnnotation!")
         }
@@ -131,6 +130,18 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
             photoAlbumViewController.photosController = PhotosController(virtualTouristAPI: VirtualTouristAPI(), dataController: self.dataController)
         }
 
+    }
+
+
+}
+
+extension MapViewController: NSFetchedResultsControllerDelegate {
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        if (type == .insert) {
+            if let pin = controller.object(at: newIndexPath!) as? Pin {
+                travelLocationsMap.addPinToMap(coordinates: CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude))
+            }
+        }
     }
 
 }
