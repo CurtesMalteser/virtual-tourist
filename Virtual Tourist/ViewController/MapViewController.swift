@@ -15,6 +15,11 @@ class MapViewController: UIViewController {
 
     private lazy var longPressRecogniser: UILongPressGestureRecognizer = initLongPressGestureRecognizer()
 
+    private lazy var postLocationErrorMessage = """
+                                                Couldn't add new location.
+                                                Please try again.
+                                                """
+
     var dataController: DataController!
 
     var fetchedResultsController: NSFetchedResultsController<Pin>!
@@ -41,7 +46,7 @@ class MapViewController: UIViewController {
                 fetchRequest: fetchRequest,
                 managedObjectContext: dataController.viewContext,
                 sectionNameKeyPath: nil,
-                cacheName: nil
+                cacheName: "MapViewController"
         )
 
         fetchedResultsController.delegate = self
@@ -79,14 +84,17 @@ class MapViewController: UIViewController {
 
     private func addPinPointAnnotation(coordinates: CLLocationCoordinate2D) {
 
+       let networkActivityIndicator = showNetworkActivityAlert()
+
         let latitude = coordinates.latitude
         let longitude = coordinates.longitude
 
         func storePinOnResult() {
             do {
                 try fetchedResultsController.managedObjectContext.save()
+                networkActivityIndicator.dismiss(animated: false, completion: nil)
             } catch {
-                print("Failed save addPinPointAnnotation!")
+                showErrorAlert(message: postLocationErrorMessage)
             }
         }
 
