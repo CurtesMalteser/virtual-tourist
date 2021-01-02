@@ -35,6 +35,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     lazy var apiKey: String = (UIApplication.shared.delegate as! AppDelegate).apiKey
 
+    private lazy var deletePhotoErrorMessage = """
+                                               Couldn't delete photo.
+                                               Please try again.
+                                               """
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -95,7 +100,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         do {
             try fetchedResultsController.performFetch()
         } catch {
-            fatalError("Could not perform fetch: \n\(error.localizedDescription)")
+            fatalError("Could not perform fetch:\n\(error.localizedDescription)")
         }
     }
 
@@ -146,9 +151,13 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     func deletePhoto(at indexPath: IndexPath) {
-        let photoToDelete = fetchedResultsController.object(at: indexPath)
-        context.delete(photoToDelete)
-        try? context.save()
+        context.doTry(onSuccess: { context in
+            let photoToDelete = fetchedResultsController.object(at: indexPath)
+            context.delete(photoToDelete)
+            try context.save()
+        }, onError: { _ in
+            showErrorAlert(message: deletePhotoErrorMessage)
+        })
     }
 
     private func fetchPhotosForPin(isNewCollection: Bool) {
@@ -168,12 +177,12 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         if (!fetchedResultsController.fetchedObjects!.isEmpty) {
             if let fetchedPhotos = fetchedResultsController.fetchedObjects {
                 fetchedPhotos.forEach { photo in
-                    dataController.viewContext.delete(photo)
-                    do {
-                        try dataController.viewContext.save()
-                    } catch {
-                        print("Failed to delete Photo!")
-                    }
+                    context.doTry(onSuccess: { context in
+                        context.delete(photo)
+                        try context.save()
+                    }, onError: { error in
+                        showErrorAlert(message: deletePhotoErrorMessage)
+                    })
                 }
             }
         }

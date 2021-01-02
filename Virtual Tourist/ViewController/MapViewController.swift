@@ -20,6 +20,11 @@ class MapViewController: UIViewController {
                                                 Please try again.
                                                 """
 
+    private lazy var fetchPinForSegueErrorMessage = """
+                                                    Couldn't find Pin for location.
+                                                    Please try again.
+                                                    """
+
     var dataController: DataController!
 
     var fetchedResultsController: NSFetchedResultsController<Pin>!
@@ -84,18 +89,18 @@ class MapViewController: UIViewController {
 
     private func addPinPointAnnotation(coordinates: CLLocationCoordinate2D) {
 
-       let networkActivityIndicator = showNetworkActivityAlert()
+        let networkActivityIndicator = showNetworkActivityAlert()
 
         let latitude = coordinates.latitude
         let longitude = coordinates.longitude
 
         func storePinOnResult() {
-            do {
-                try fetchedResultsController.managedObjectContext.save()
+            fetchedResultsController.managedObjectContext.doTry(onSuccess: { context in
+                try context.save()
                 networkActivityIndicator.dismiss(animated: false, completion: nil)
-            } catch {
+            }, onError: { _ in
                 showErrorAlert(message: postLocationErrorMessage)
-            }
+            })
         }
 
         CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: latitude, longitude: longitude),
@@ -184,10 +189,18 @@ extension MapViewController: MKMapViewDelegate {
 
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
 
-        let pin = try? fetchedResultsController.managedObjectContext.fetch(fetchRequest).first
-
-        pushPhotoAlbumViewController(pin: pin!)
-
+        fetchedResultsController.managedObjectContext.doTry(
+                onSuccess: { context in
+                    if let pin = try context.fetch(fetchRequest).first {
+                        pushPhotoAlbumViewController(pin: pin)
+                    } else {
+                        showErrorAlert(message: fetchPinForSegueErrorMessage)
+                    }
+                },
+                onError: { _ in
+                    showErrorAlert(message: fetchPinForSegueErrorMessage)
+                }
+        )
     }
 
 }
