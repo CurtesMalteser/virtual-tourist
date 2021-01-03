@@ -23,6 +23,9 @@ extension UIViewController {
         }
     }
 
+    /**
+     Convenience function to show UIAlertController to sign background (internet or access DB) activity.
+     */
     func showNetworkActivityAlert(_ completionHandler: @escaping (_ alertController: UIAlertController) -> Void) {
         let alert = UIAlertController(title: nil, message: "Please wait...", preferredStyle: .alert)
 

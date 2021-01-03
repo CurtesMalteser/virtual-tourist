@@ -137,8 +137,8 @@ class MapViewController: UIViewController {
                 navigationController: navigationController) { viewController in
             let photoAlbumViewController = viewController as! PhotoAlbumViewController
             photoAlbumViewController.pin = pin
-            photoAlbumViewController.dataController = self.dataController
-            photoAlbumViewController.photosController = PhotosController(virtualTouristAPI: VirtualTouristAPI(), dataController: self.dataController)
+            photoAlbumViewController.dataController = dataController
+            photoAlbumViewController.photosController = PhotosController(virtualTouristAPI: VirtualTouristAPI(), dataController: dataController)
         }
 
     }

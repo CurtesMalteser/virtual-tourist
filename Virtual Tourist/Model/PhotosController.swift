@@ -13,6 +13,7 @@ class PhotosController {
     private var _virtualTouristAPI: VirtualTouristAPI!
     private var _dataController: DataController!
     private var _backgroundContext: NSManagedObjectContext!
+    // used to avoid double API calls
     private var _isInProgress: Bool = false
 
     init(virtualTouristAPI: VirtualTouristAPI, dataController: DataController) {
@@ -99,7 +100,6 @@ class PhotosController {
         let lastPhoto = photosSearch.photos.photoListResponse!.last!
 
         photosSearch.photos.photoListResponse?.forEach({ photoResponse in
-
 
             let url = Endpoint
                     .fetchPhotoURLs(apiKey: apiKey, photoResponse: photoResponse)

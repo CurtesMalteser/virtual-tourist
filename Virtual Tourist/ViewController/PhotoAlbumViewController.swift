@@ -31,6 +31,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     var fetchedResultsController: NSFetchedResultsController<Photo>!
 
+    // used to avoid double API calls
+    var isInProgress: Bool = false
+
     lazy var context = fetchedResultsController.managedObjectContext
 
     lazy var apiKey: String = (UIApplication.shared.delegate as! AppDelegate).apiKey
@@ -67,12 +70,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
         mapView.addPinToMap(pin)
 
-        initFetchPhotosController()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //initFetchPhotosController()
+        initFetchPhotosController()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -168,8 +170,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         }
 
     }
-
-    var isInProgress: Bool = false
 
     private func fetchPhotosForPin(isNewCollection: Bool) {
 
