@@ -31,8 +31,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     var fetchedResultsController: NSFetchedResultsController<Photo>!
 
-    private var networkActivityIndicator : UIAlertController? = nil
-
     lazy var context = fetchedResultsController.managedObjectContext
 
     lazy var apiKey: String = (UIApplication.shared.delegate as! AppDelegate).apiKey
@@ -68,11 +66,13 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         mapView.isUserInteractionEnabled = false
 
         mapView.addPinToMap(pin)
+
+        initFetchPhotosController()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        initFetchPhotosController()
+        //initFetchPhotosController()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -153,54 +153,70 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     func deletePhoto(at indexPath: IndexPath) {
-        context.doTry(onSuccess: { context in
-            let photoToDelete = fetchedResultsController.object(at: indexPath)
-            context.delete(photoToDelete)
-            try context.save()
-        }, onError: { _ in
-            showErrorAlert(message: deletePhotoErrorMessage)
-        })
+
+        showNetworkActivityAlert { [self] deletePhotoIndicator in
+            context.doTry(onSuccess: { context in
+                let photoToDelete = fetchedResultsController.object(at: indexPath)
+                context.delete(photoToDelete)
+                try context.save()
+                deletePhotoIndicator.dismiss(animated: false)
+            }, onError: { _ in
+                showErrorAlert(message: deletePhotoErrorMessage) {
+                    deletePhotoIndicator.dismiss(animated: false)
+                }
+            })
+        }
+
     }
+
+    var isInProgress: Bool = false
 
     private func fetchPhotosForPin(isNewCollection: Bool) {
 
-        networkActivityIndicator = showNetworkActivityAlert()
-        self.networkActivityIndicator!.dismiss(animated: false, completion: nil)
+        if (isInProgress) {
+            return
+        }
 
-        func dispatchStatusOnMainThread(statusHandler: @escaping () -> Void) {
-            DispatchQueue.main.async {
-                statusHandler()
-                self.networkActivityIndicator!.dismiss(animated: false, completion: nil)
+        isInProgress = true
+
+        showNetworkActivityAlert { networkActivityIndicator in
+
+            func dispatchStatusOnMainThread(statusHandler: @escaping () -> Void) {
+                print("networkActivityIndicator \(networkActivityIndicator)")
+                DispatchQueue.main.async {
+                    networkActivityIndicator.dismiss(animated: false) {
+                        statusHandler()
+                        self.isInProgress = false
+                    }
+                }
+            }
+
+            self.photosController.fetchPhotosForPin(pin: self.pin,
+                    apiKey: self.apiKey,
+                    isNewCollection: isNewCollection
+            ) { status in
+
+                switch status {
+                case Status.success:
+                    dispatchStatusOnMainThread {
+                        self.photosCollectionView.restore()
+                    }
+                    break
+                case Status.noData:
+                    dispatchStatusOnMainThread {
+                        self.photosCollectionView.setEmptyMessage("No Data")
+                    }
+                    break
+                case Status.error:
+                    dispatchStatusOnMainThread {
+                        self.photosCollectionView.setEmptyMessage("Error! Please try again")
+                    }
+                    break
+                }
+
             }
         }
 
-        photosController.fetchPhotosForPin(pin: pin,
-                apiKey: apiKey,
-                isNewCollection: isNewCollection
-        ) { status in
-
-            print("set status \(status)")
-
-
-            switch status {
-            case Status.success:
-                dispatchStatusOnMainThread {
-                    self.photosCollectionView.restore()
-                }
-                break
-            case Status.noData:
-                dispatchStatusOnMainThread {
-                   self.photosCollectionView.setEmptyMessage("No Data")
-                }
-                break
-            case Status.error:
-                dispatchStatusOnMainThread {
-                    self.photosCollectionView.setEmptyMessage("Error! Please try again")
-                }
-                break
-            }
-
-        }
     }
 
     func fetchNewCollection() {

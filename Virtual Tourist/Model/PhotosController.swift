@@ -73,8 +73,8 @@ class PhotosController {
 
                     if let photoListResponse = photosSearch.photos.photoListResponse {
                         if (photoListResponse.isEmpty) {
-                            _isInProgress = false
                             completionHandler(Status.noData)
+                            _isInProgress = false
                         } else {
                             forEachPhotoFetchURL(photosSearch: photosSearch,
                                     apiKey: apiKey,
