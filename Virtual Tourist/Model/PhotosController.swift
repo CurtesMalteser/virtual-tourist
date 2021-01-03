@@ -25,15 +25,18 @@ class PhotosController {
         _virtualTouristAPI.executeFetchPhotoDataTask(url: photo.photoURL!,
                 successHandler: { (data: Data) in
                     self._backgroundContext.doTry(onSuccess: { context in
-                        photo.photo = data
+
+                        let backgroundPhoto = context.object(with: photo.objectID) as! Photo
+                        backgroundPhoto.photo = data
+
                         try context.save()
-                    }
-                            , onError: { error in
-                        print("get photo error \(error)")
+
+                    }, onError: { error in
+                        print("executeFetchPhotoDataTask save photo error \(error)")
                     })
                 }, errorHandler: { error in
             if let error = error {
-                print(error)
+                print("executeFetchPhotoDataTask error \(error)")
             }
         })
     }
@@ -78,6 +81,7 @@ class PhotosController {
                                     backgroundContext: _backgroundContext,
                                     backgroundPin: backgroundPin,
                                     completionHandler: completionHandler)
+
                         }
                     }
                 }, errorHandler: { _ in

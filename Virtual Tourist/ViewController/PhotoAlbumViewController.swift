@@ -31,6 +31,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     var fetchedResultsController: NSFetchedResultsController<Photo>!
 
+    private var networkActivityIndicator : UIAlertController? = nil
+
     lazy var context = fetchedResultsController.managedObjectContext
 
     lazy var apiKey: String = (UIApplication.shared.delegate as! AppDelegate).apiKey
@@ -127,7 +129,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         let photosCount = fetchedResultsController.sections?[0].numberOfObjects ?? 0
 
         if (photosCount == 0) {
-            fetchPhotosForPin(isNewCollection: pin.pages != 0)
+            fetchPhotosForPin(isNewCollection: true)
         }
 
         return photosCount
@@ -162,26 +164,42 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     private func fetchPhotosForPin(isNewCollection: Bool) {
 
-        let networkActivityIndicator = showNetworkActivityAlert()
+        networkActivityIndicator = showNetworkActivityAlert()
+        self.networkActivityIndicator!.dismiss(animated: false, completion: nil)
+
+        func dispatchStatusOnMainThread(statusHandler: @escaping () -> Void) {
+            DispatchQueue.main.async {
+                statusHandler()
+                self.networkActivityIndicator!.dismiss(animated: false, completion: nil)
+            }
+        }
 
         photosController.fetchPhotosForPin(pin: pin,
                 apiKey: apiKey,
                 isNewCollection: isNewCollection
         ) { status in
-            switch status {
 
+            print("set status \(status)")
+
+
+            switch status {
             case Status.success:
-                DispatchQueue.main.async {
-                    networkActivityIndicator.dismiss(animated: false, completion: nil)
+                dispatchStatusOnMainThread {
+                    self.photosCollectionView.restore()
                 }
                 break
             case Status.noData:
+                dispatchStatusOnMainThread {
+                   self.photosCollectionView.setEmptyMessage("No Data")
+                }
                 break
             case Status.error:
+                dispatchStatusOnMainThread {
+                    self.photosCollectionView.setEmptyMessage("Error! Please try again")
+                }
                 break
-
-
             }
+
         }
     }
 
@@ -228,5 +246,24 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         @unknown default:
             fatalError("NSFetchedResultsControllerDelegate did change unknown!")
         }
+    }
+}
+
+extension UICollectionView {
+
+    func setEmptyMessage(_ message: String) {
+        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: bounds.size.width, height: bounds.size.height))
+        messageLabel.text = message
+        messageLabel.textColor = .black
+        messageLabel.numberOfLines = 0;
+        messageLabel.textAlignment = .center;
+        messageLabel.font = UIFont(name: "San Francisco", size: 15)
+        messageLabel.sizeToFit()
+
+        backgroundView = messageLabel;
+    }
+
+    func restore() {
+        backgroundView = nil
     }
 }
