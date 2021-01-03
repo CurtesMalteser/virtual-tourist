@@ -38,7 +38,7 @@ class PhotosController {
         })
     }
 
-    func fetchPhotosForPin(pin: Pin, apiKey: String, isNewCollection: Bool) {
+    func fetchPhotosForPin(pin: Pin, apiKey: String, isNewCollection: Bool, completionHandler: @escaping (_ status: Status) -> Void) {
 
         if (_isInProgress) {
             return
@@ -68,21 +68,34 @@ class PhotosController {
                     backgroundPin.pages = Int64(photosSearch.photos.pages)
                     backgroundPin.currentPage = Int64(photosSearch.photos.page)
 
-                    // todo -> show no data if photosSearch.photos.photoListResponse is empty
-                    forEachPhotoFetchURL(photosSearch: photosSearch, apiKey: apiKey, backgroundContext: _backgroundContext, backgroundPin: backgroundPin)
-                },
-
-                errorHandler: { _ in
-                    self._isInProgress = false
-                    // todo -> show no data with error
-                })
+                    if let photoListResponse = photosSearch.photos.photoListResponse {
+                        if (photoListResponse.isEmpty) {
+                            _isInProgress = false
+                            completionHandler(Status.noData)
+                        } else {
+                            forEachPhotoFetchURL(photosSearch: photosSearch,
+                                    apiKey: apiKey,
+                                    backgroundContext: _backgroundContext,
+                                    backgroundPin: backgroundPin,
+                                    completionHandler: completionHandler)
+                        }
+                    }
+                }, errorHandler: { _ in
+            self._isInProgress = false
+            completionHandler(Status.error)
+        })
     }
 
-    private func forEachPhotoFetchURL(photosSearch: PhotosSearch, apiKey: String, backgroundContext: NSManagedObjectContext, backgroundPin: Pin) -> ()? {
+    private func forEachPhotoFetchURL(photosSearch: PhotosSearch,
+                                      apiKey: String,
+                                      backgroundContext: NSManagedObjectContext,
+                                      backgroundPin: Pin,
+                                      completionHandler: @escaping (_ status: Status) -> Void) {
+
+        let lastPhoto = photosSearch.photos.photoListResponse!.last!
 
         photosSearch.photos.photoListResponse?.forEach({ photoResponse in
 
-            let lastPhoto = photosSearch.photos.photoListResponse!.last!
 
             let url = Endpoint
                     .fetchPhotoURLs(apiKey: apiKey, photoResponse: photoResponse)
@@ -103,19 +116,20 @@ class PhotosController {
 
                             if (lastPhoto.id == photoResponse.id) {
                                 _isInProgress = false
+                                completionHandler(Status.success)
                             }
 
                         }, onError: { error in
                             if (lastPhoto.id == photoResponse.id) {
                                 _isInProgress = false
+                                completionHandler(Status.success)
                             }
                         })
 
-
                     }, errorHandler: { _ in
-
-                self._isInProgress = false
-
+                if (lastPhoto.id == photoResponse.id) {
+                    self._isInProgress = false
+                }
             })
         })
     }

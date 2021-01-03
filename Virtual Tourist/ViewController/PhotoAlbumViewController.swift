@@ -161,9 +161,28 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
 
     private func fetchPhotosForPin(isNewCollection: Bool) {
+
+        let networkActivityIndicator = showNetworkActivityAlert()
+
         photosController.fetchPhotosForPin(pin: pin,
                 apiKey: apiKey,
-                isNewCollection: isNewCollection)
+                isNewCollection: isNewCollection
+        ) { status in
+            switch status {
+
+            case Status.success:
+                DispatchQueue.main.async {
+                    networkActivityIndicator.dismiss(animated: false, completion: nil)
+                }
+                break
+            case Status.noData:
+                break
+            case Status.error:
+                break
+
+
+            }
+        }
     }
 
     func fetchNewCollection() {

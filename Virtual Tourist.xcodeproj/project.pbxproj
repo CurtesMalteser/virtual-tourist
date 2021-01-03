@@ -31,6 +31,7 @@
 		92AB3B162575341D00C641B7 /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 92AB3B152575341D00C641B7 /* Secrets.plist */; };
 		92E20269259B967B003D45A6 /* UIImage+ImagePlaceHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E20268259B967B003D45A6 /* UIImage+ImagePlaceHolder.swift */; };
 		92E2026E259BA0C5003D45A6 /* Pin+CLPlacemark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E2026D259BA0C5003D45A6 /* Pin+CLPlacemark.swift */; };
+		92F9C03225A21D9F00E55BBF /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F9C03125A21D9E00E55BBF /* Status.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 		92AB3B152575341D00C641B7 /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Secrets.plist; sourceTree = "<group>"; };
 		92E20268259B967B003D45A6 /* UIImage+ImagePlaceHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+ImagePlaceHolder.swift"; sourceTree = "<group>"; };
 		92E2026D259BA0C5003D45A6 /* Pin+CLPlacemark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pin+CLPlacemark.swift"; sourceTree = "<group>"; };
+		92F9C03125A21D9E00E55BBF /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +150,7 @@
 				9220E00A2576C6CD0082E673 /* DataController.swift */,
 				71A926B697869D453D74CD97 /* Network */,
 				927D5624259926EE00C8E098 /* PhotosController.swift */,
+				92F9C03125A21D9E00E55BBF /* Status.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -380,6 +383,7 @@
 				927D5625259926EE00C8E098 /* PhotosController.swift in Sources */,
 				92E20269259B967B003D45A6 /* UIImage+ImagePlaceHolder.swift in Sources */,
 				71A924C237E7846DC9AD9141 /* UIViewController+Navigation.swift in Sources */,
+				92F9C03225A21D9F00E55BBF /* Status.swift in Sources */,
 				71A929F6DB923B8D39B5A5CC /* UIViewController+UIAlertController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
