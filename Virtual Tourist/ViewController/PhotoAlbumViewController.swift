@@ -20,7 +20,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
 
     @IBAction func actionNewCollection(_ sender: Any) {
-        fetchPhotosForPin()
+        fetchNewCollection()
     }
 
     static let identifier: String = "PhotoAlbumViewController"
@@ -34,6 +34,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     lazy var context = fetchedResultsController.managedObjectContext
 
     lazy var apiKey: String = (UIApplication.shared.delegate as! AppDelegate).apiKey
+
+    private lazy var deletePhotoErrorMessage = """
+                                               Couldn't delete photo.
+                                               Please try again.
+                                               """
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,11 +66,13 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         mapView.isUserInteractionEnabled = false
 
         mapView.addPinToMap(pin)
+
+        initFetchPhotosController()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        initFetchPhotosController()
+        //initFetchPhotosController()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -95,7 +102,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         do {
             try fetchedResultsController.performFetch()
         } catch {
-            fatalError("Could not perform fetch: \n\(error.localizedDescription)")
+            fatalError("Could not perform fetch:\n\(error.localizedDescription)")
         }
     }
 
@@ -122,7 +129,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         let photosCount = fetchedResultsController.sections?[0].numberOfObjects ?? 0
 
         if (photosCount == 0) {
-            fetchPhotosForPin()
+            fetchPhotosForPin(isNewCollection: true)
         }
 
         return photosCount
@@ -145,23 +152,101 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         flowLayout.itemSize = CGSize(width: dimension, height: dimension)
     }
 
-    private func deletePhoto(at indexPath: IndexPath) {
-        let photoToDelete = fetchedResultsController.object(at: indexPath)
-        context.delete(photoToDelete)
-        try? context.save()
+    func deletePhoto(at indexPath: IndexPath) {
+
+        showNetworkActivityAlert { [self] deletePhotoIndicator in
+            context.doTry(onSuccess: { context in
+                let photoToDelete = fetchedResultsController.object(at: indexPath)
+                context.delete(photoToDelete)
+                try context.save()
+                deletePhotoIndicator.dismiss(animated: false)
+            }, onError: { _ in
+                showErrorAlert(message: deletePhotoErrorMessage) {
+                    deletePhotoIndicator.dismiss(animated: false)
+                }
+            })
+        }
+
     }
 
-    private func fetchPhotosForPin() {
-        photosController.fetchPhotosForPin(pin: pin, apiKey: apiKey)
+    var isInProgress: Bool = false
+
+    private func fetchPhotosForPin(isNewCollection: Bool) {
+
+        if (isInProgress) {
+            return
+        }
+
+        isInProgress = true
+
+        showNetworkActivityAlert { networkActivityIndicator in
+
+            func dispatchStatusOnMainThread(statusHandler: @escaping () -> Void) {
+                print("networkActivityIndicator \(networkActivityIndicator)")
+                DispatchQueue.main.async {
+                    networkActivityIndicator.dismiss(animated: false) {
+                        statusHandler()
+                        self.isInProgress = false
+                    }
+                }
+            }
+
+            self.photosController.fetchPhotosForPin(pin: self.pin,
+                    apiKey: self.apiKey,
+                    isNewCollection: isNewCollection
+            ) { status in
+
+                switch status {
+                case Status.success:
+                    dispatchStatusOnMainThread {
+                        self.photosCollectionView.restore()
+                    }
+                    break
+                case Status.noData:
+                    dispatchStatusOnMainThread {
+                        self.photosCollectionView.setEmptyMessage("No Data")
+                    }
+                    break
+                case Status.error:
+                    dispatchStatusOnMainThread {
+                        self.photosCollectionView.setEmptyMessage("Error! Please try again")
+                    }
+                    break
+                }
+
+            }
+        }
+
+    }
+
+    func fetchNewCollection() {
+
+        photosCollectionView.visibleCells.forEach { cell in
+            if let photoCell = cell as? PhotoCollectionViewCell {
+                photoCell.imageView.image = UIImage.imagePlaceholder()
+            }
+        }
+
+        if (!fetchedResultsController.fetchedObjects!.isEmpty) {
+            if let fetchedPhotos = fetchedResultsController.fetchedObjects {
+                fetchedPhotos.forEach { photo in
+                    context.doTry(onSuccess: { context in
+                        context.delete(photo)
+                        try context.save()
+                    }, onError: { error in
+                        showErrorAlert(message: deletePhotoErrorMessage)
+                    })
+                }
+            }
+        }
+
+        fetchPhotosForPin(isNewCollection: true)
+
     }
 
 }
 
 extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
-
-    public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        photosCollectionView.reloadData()
-    }
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
@@ -172,8 +257,29 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
             photosCollectionView.deleteItems(at: [indexPath!])
         case .update:
             photosCollectionView.reloadItems(at: [indexPath!])
+        case .move:
+            photosCollectionView.moveItem(at: indexPath!, to: newIndexPath!)
         @unknown default:
-            break
+            fatalError("NSFetchedResultsControllerDelegate did change unknown!")
         }
+    }
+}
+
+extension UICollectionView {
+
+    func setEmptyMessage(_ message: String) {
+        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: bounds.size.width, height: bounds.size.height))
+        messageLabel.text = message
+        messageLabel.textColor = .black
+        messageLabel.numberOfLines = 0;
+        messageLabel.textAlignment = .center;
+        messageLabel.font = UIFont(name: "San Francisco", size: 15)
+        messageLabel.sizeToFit()
+
+        backgroundView = messageLabel;
+    }
+
+    func restore() {
+        backgroundView = nil
     }
 }

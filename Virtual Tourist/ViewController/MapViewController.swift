@@ -15,13 +15,22 @@ class MapViewController: UIViewController {
 
     private lazy var longPressRecogniser: UILongPressGestureRecognizer = initLongPressGestureRecognizer()
 
+    private lazy var postLocationErrorMessage = """
+                                                Couldn't add new location.
+                                                Please try again.
+                                                """
+
+    private lazy var fetchPinForSegueErrorMessage = """
+                                                    Couldn't find Pin for location.
+                                                    Please try again.
+                                                    """
+
     var dataController: DataController!
 
     var fetchedResultsController: NSFetchedResultsController<Pin>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
         travelLocationsMap.delegate = self
         travelLocationsMap.addGestureRecognizer(longPressRecogniser)
     }
@@ -41,7 +50,7 @@ class MapViewController: UIViewController {
                 fetchRequest: fetchRequest,
                 managedObjectContext: dataController.viewContext,
                 sectionNameKeyPath: nil,
-                cacheName: nil
+                cacheName: "MapViewController"
         )
 
         fetchedResultsController.delegate = self
@@ -79,37 +88,40 @@ class MapViewController: UIViewController {
 
     private func addPinPointAnnotation(coordinates: CLLocationCoordinate2D) {
 
-        let latitude = coordinates.latitude
-        let longitude = coordinates.longitude
+        showNetworkActivityAlert { [self] networkActivityIndicator in
 
-        func storePinOnResult() {
-            do {
-                try fetchedResultsController.managedObjectContext.save()
-            } catch {
-                print("Failed save addPinPointAnnotation!")
-            }
-        }
+            let latitude = coordinates.latitude
+            let longitude = coordinates.longitude
 
-        CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: latitude, longitude: longitude),
-                completionHandler: { placemarks, error in
-
-                    let pin = Pin(context: self.fetchedResultsController.managedObjectContext)
-                    pin.latitude = latitude
-                    pin.longitude = longitude
-
-                    if (error != nil) {
-                        pin.setAddressOnPlacemarkError()
-                        storePinOnResult()
-                    }
-
-                    let placemark = placemarks?.first
-                    if let mark = placemark {
-                        pin.setAddressFromPlaceMark(mark)
-                        storePinOnResult()
-                    }
-
+            func storePinOnResult() {
+                fetchedResultsController.managedObjectContext.doTry(onSuccess: { context in
+                    try context.save()
+                    networkActivityIndicator.dismiss(animated: false, completion: nil)
+                }, onError: { _ in
+                    showErrorAlert(message: postLocationErrorMessage)
                 })
+            }
 
+            CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: latitude, longitude: longitude),
+                    completionHandler: { placemarks, error in
+
+                        let pin = Pin(context: fetchedResultsController.managedObjectContext)
+                        pin.latitude = latitude
+                        pin.longitude = longitude
+
+                        if (error != nil) {
+                            pin.setAddressOnPlacemarkError()
+                            storePinOnResult()
+                        }
+
+                        let placemark = placemarks?.first
+                        if let mark = placemark {
+                            pin.setAddressFromPlaceMark(mark)
+                            storePinOnResult()
+                        }
+
+                    })
+        }
     }
 
     private func initLongPressGestureRecognizer() -> UILongPressGestureRecognizer {
@@ -176,10 +188,18 @@ extension MapViewController: MKMapViewDelegate {
 
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
 
-        let pin = try? fetchedResultsController.managedObjectContext.fetch(fetchRequest).first
-
-        pushPhotoAlbumViewController(pin: pin!)
-
+        fetchedResultsController.managedObjectContext.doTry(
+                onSuccess: { context in
+                    if let pin = try context.fetch(fetchRequest).first {
+                        pushPhotoAlbumViewController(pin: pin)
+                    } else {
+                        showErrorAlert(message: fetchPinForSegueErrorMessage)
+                    }
+                },
+                onError: { _ in
+                    showErrorAlert(message: fetchPinForSegueErrorMessage)
+                }
+        )
     }
 
 }
