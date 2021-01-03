@@ -24,17 +24,17 @@ class PhotosController {
     func fetchPhotoForSize(photo: Photo) {
         _virtualTouristAPI.executeFetchPhotoDataTask(url: photo.photoURL!,
                 successHandler: { (data: Data) in
-                    self._backgroundContext.perform {
-                        do {
-                            photo.photo = data
-                            try self._backgroundContext.save()
-                        } catch {
-                            // todo handle with meaningful info to the user
-                            print("get photo error \(error)")
-                        }
+                    self._backgroundContext.doTry(onSuccess: { context in
+                        photo.photo = data
+                        try context.save()
                     }
+                            , onError: { error in
+                        print("get photo error \(error)")
+                    })
                 }, errorHandler: { error in
-            print(error)
+            if let error = error {
+                print(error)
+            }
         })
     }
 
@@ -68,12 +68,13 @@ class PhotosController {
                     backgroundPin.pages = Int64(photosSearch.photos.pages)
                     backgroundPin.currentPage = Int64(photosSearch.photos.page)
 
+                    // todo -> show no data if photosSearch.photos.photoListResponse is empty
                     forEachPhotoFetchURL(photosSearch: photosSearch, apiKey: apiKey, backgroundContext: _backgroundContext, backgroundPin: backgroundPin)
                 },
 
-                errorHandler: { error in
+                errorHandler: { _ in
                     self._isInProgress = false
-                    print(error)
+                    // todo -> show no data with error
                 })
     }
 
@@ -88,37 +89,43 @@ class PhotosController {
                     .url
 
             _virtualTouristAPI.executeDataTask(url: url,
-                    successHandler: { (photoSizeResponse: PhotoSizeResponse) in
+                    successHandler: { [self] (photoSizeResponse: PhotoSizeResponse) in
 
                         let largeSize: PhotoSize = photoSizeResponse.sizes!.photoSize.first { size in
                             size.size == PhotoSizeEnum.large
                         } ?? photoSizeResponse.sizes!.photoSize.last!
 
-                        backgroundContext.perform {
+                        backgroundContext.doTry(onSuccess: { context in
 
-                            do {
-                                let photo = Photo(context: backgroundContext)
-                                photo.pin = backgroundPin
-                                photo.photoID = photoResponse.id
-                                photo.photoURL = URL(string: largeSize.photoURL)
-                                photo.photo = nil
+                            initializePhoto(context: context, backgroundPin: backgroundPin, photoResponse: photoResponse, largeSize: largeSize)
 
-                                try backgroundContext.save()
-                            } catch {
-                                // todo handle with meaningful info to the user
-                                print("get photo error \(error)")
+                            try context.save()
+
+                            if (lastPhoto.id == photoResponse.id) {
+                                _isInProgress = false
                             }
-                        }
 
-                        if (lastPhoto.id == photoResponse.id) {
-                            self._isInProgress = false
-                        }
-                    }, errorHandler: { error in
+                        }, onError: { error in
+                            if (lastPhoto.id == photoResponse.id) {
+                                _isInProgress = false
+                            }
+                        })
+
+
+                    }, errorHandler: { _ in
+
                 self._isInProgress = false
 
-                print(error)
             })
         })
+    }
+
+    private func initializePhoto(context: NSManagedObjectContext, backgroundPin: Pin, photoResponse: PhotoResponse, largeSize: PhotoSize) {
+        let photo = Photo(context: context)
+        photo.pin = backgroundPin
+        photo.photoID = photoResponse.id
+        photo.photoURL = URL(string: largeSize.photoURL)
+        photo.photo = nil
     }
 
     deinit {
